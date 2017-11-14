@@ -12,31 +12,9 @@ You can install the cloudwatch2humio integration using the installation script o
 **EU Central 1**:
 [![Install cloudwatch2humio in EU Central 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in EU Central 1")](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://s3.amazonaws.com/humio-public-us-east-1/cloudformation.json)
 
-### installation script
-The easiest way to get started is to use the `install.sh` bash script we've provided. This script assumes that you have the [aws cli](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and `jq` installed. You can install `jq` using brew via `brew install jq`.
-
-You'll want to modify a few variables in `install.sh` before you run it, or at least review them:
-
-* `stack_name` - by default this is `humio-aws-integration`
-* `humio_dataspace_name` - set this to the dataspace in Humio you'd like to ship your logs to
-* `humio_ingest_token` - set this to the ingest token given to you by Humio
-* `humio_auto_subscription` - by default this is `true` and will auto subscripbe any *new* log groups to the humio ingestion lambda
-* `humio_auto_backfiller` - by default this is `true` and will trigger shortly after the suite is installed. This will connect all of your existing cloudwatch groups to humio. 
-
-Once you've reviewed the variables, go ahead and run `./install.sh`. You should see output similar to this:
-
-```
-> ./install.sh
-found aws cli, installing humio ingestion suite...
-......................................................
-install complete! We will now connect all of your cloudformation log groups to the humio log ingester.
-```
-
-If you don't see output like this, or experience an error please contact us in the [meethumio slack](https://meethumio.slack.com). Please create a [secret gist](https://gist.github.com) of any output you can, as it will help us diagnose your issue.
-
 ### Cloudformation
 
-The humio ingestion suite uses Cloudformation to install itself. You can either use `install.sh` to install easily or install using the cloudformation template directly.
+The humio ingestion suite uses Cloudformation to install itself.
 
 The cloudformation template supports the following parameters:
 
