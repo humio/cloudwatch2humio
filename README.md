@@ -10,7 +10,7 @@ You can install the cloudwatch2humio integration using the installation script o
 [![Install cloudwatch2humio in US East 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in US East 1")](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://s3.amazonaws.com/humio-public-us-east-1/cloudformation.json)
 
 **EU Central 1**:
-![https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://s3.amazonaws.com/humio-public-us-east-1/cloudformation.json](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)
+[![Install cloudwatch2humio in EU Central 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in EU Central 1")](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://s3.amazonaws.com/humio-public-us-east-1/cloudformation.json)
 
 ### installation script
 The easiest way to get started is to use the `install.sh` bash script we've provided. This script assumes that you have the [aws cli](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and `jq` installed. You can install `jq` using brew via `brew install jq`.
