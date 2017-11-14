@@ -1,6 +1,6 @@
 # cloudwatch2humio
 
-This Humio integration will connect your AWS Cloudwatch Log Groups to an AWS Lambda that ships your logs from Cloudwatch Logs to Humio. Below you'll find installation and troubleshooting steps. If you have any issues, please join us on slack at [meethumio.slack.com](https://meethumio.slack.com). 
+This Humio integration will connect your AWS Cloudwatch Log Groups to an AWS Lambda that ships your logs from Cloudwatch to Humio. Below you'll find installation and troubleshooting steps. If you have any issues, you can reach us on support@humio.com.
 
 ## Installation
 
@@ -21,6 +21,7 @@ The humio ingestion suite uses Cloudformation to install itself.
 
 The cloudformation template supports the following parameters:
 
+* `HumioAutoSubscription` - Enable automaticr subscription to new log groups.
 * `HumioDataspaceName` - The name of your dataspace in humio that you want to ship logs to.
 * `HumioProtocol` - The transport protocol used for delivering log events to Humio. HTTPS is default and recommended.
 * `HumioHost` - The host you want to ship your humio logs to. 
@@ -57,13 +58,13 @@ $ aws cloudformation list-stacks
 
 This integration will install three lambas, the `AutoSubscriber`,`CloudwatchIngester` and the `CloudwatchBackfiller`.
 
-### Ingester
+### CloudwatchIngester
 
-This function handles the delivery of your Cloudwatch log events to Humio.
+This lambda handles the delivery of your Cloudwatch log events to Humio.
 
-### Auto Subscriber
-This function will auto subscribe the Humio Log Ingester every time a new log group is created. This is done by filtering CloudTrail events and triggering the auto subscription lambda every time a new log group is created.
+### AutoSubscriber
+This lambda will auto subscribe the Humio Log Ingester every time a new log group is created. This is done by filtering CloudTrail events and triggering the auto subscription lambda every time a new log group is created.
 
-### Backfiller
+### CloudwatchBackfiller
 This will run if you have set `humio_auto_backfiller` to `true` in the `install.sh` script or have set `HumioSubscriptionBackfiller` when executing the CloudFormation template. This function will paginate through your existing cloudwatch log groups and subscribe the Humio Log Ingester to every single one.
 
