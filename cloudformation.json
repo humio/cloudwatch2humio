@@ -1,0 +1,278 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "HumioDataspaceName": {
+      "Type": "String",
+      "Description": "The name of your dataspace in humio that you want to ship logs to.",
+      "Default": ""
+    },
+    "HumioProtocol": {
+      "Type": "String",
+      "Description": "The transport protocol used for delivering log events to Humio. HTTPS is default and recommended.",
+      "Default": "https"
+    },
+    "HumioHost": {
+      "Type": "String",
+      "Description": "The host you want to ship your humio logs to.",
+      "Default": "go.humio.com"
+    },
+    "HumioIngestToken": {
+      "Type": "String",
+      "Description": "The value of your ingest token from your Humio account.",
+      "Default": "",
+      "NoEcho": true
+    },
+    "HumioAutoSubscription": {
+      "Type": "String",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Default": "false",
+      "Description": "The Humio Ingester will automatically subscribe to new log groups you specify with the prefix below. Set to 'true' to enable."
+    },
+    "HumioSubscriptionBackfiller": {
+      "Type": "String",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Default": "true",
+      "Description": "Enabling this will backfill older log groups that existed before Humio was installed. This will run every time a new log group is created."
+    },
+    "HumioSubscriptionPrefix": {
+      "Type": "String",
+      "Description": "Humio will only subscribe to log groups with the prefix you specify",
+      "Default": ""
+    }
+  },
+  "Conditions" : {
+    "CreateAutoSubscriptionResources" : {"Fn::Equals" : [{"Ref" : "HumioAutoSubscription"}, "true"]}
+  },
+  "Resources": {
+    "HumioLoggingRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument":
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": "sts:AssumeRole",
+                "Principal": {
+                "Service": ["lambda.amazonaws.com","apigateway.amazonaws.com", "logs.amazonaws.com"]
+              },
+             "Effect": "Allow",
+             "Sid": ""
+             }
+            ]
+        }, 
+        "Policies": [
+          {
+            "PolicyName": "humio_logging_role",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "lambda:GetFunction",
+                  "lambda:InvokeAsync",
+                  "lambda:InvokeFunction",
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:DescribeLogGroups",
+                  "logs:DescribeLogStreams",
+                  "logs:DescribeSubscriptionFilters",
+                  "logs:PutSubscriptionFilter",
+                  "logs:DeleteSubscriptionFilter",
+                  "logs:PutLogEvents",
+                  "logs:GetLogEvents",
+                  "logs:FilterLogEvents"
+                ],
+                "Resource": "*"
+              }
+           ]
+          }
+          }
+        ]
+      }
+    },
+    "HumioCloudwatchIngester": {
+      "DependsOn": ["HumioLoggingRole"],
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket":  { "Fn::Join": [ "-", [ "humio-public", { "Ref": "AWS::Region" } ] ] },
+          "S3Key": "cloudwatch_humio.zip"
+        },
+        "Environment": {
+          "Variables": {
+            "humio_dataspace_name": { "Ref": "HumioDataspaceName" },
+            "humio_protocol": { "Ref": "HumioProtocol" },
+            "humio_host": { "Ref": "HumioHost" },
+            "humio_ingest_token": { "Ref": "HumioIngestToken" },
+            "humio_subscription_enable": { "Ref": "HumioAutoSubscription" }
+          }
+        },
+        "Description": "humio cloudwatch ingester",
+        "Handler": "ingester.lambda_handler",
+        "MemorySize": "128",
+        "Role": { "Fn::GetAtt": [ "HumioLoggingRole", "Arn" ] },
+        "Runtime": "python2.7",
+        "Timeout": "300"
+      }
+    },
+    "HumioCloudwatchIngesterPermission": {
+        "Type" : "AWS::Lambda::Permission",
+        "Properties" : {
+          "Action" : "lambda:InvokeFunction",
+          "FunctionName" : { "Fn::GetAtt" : ["HumioCloudwatchIngester", "Arn"] },
+          "Principal": "logs.amazonaws.com"
+        }
+    },
+    "HumioCloudwatchAutoSubscriber": {
+      "DependsOn": ["HumioLoggingRole"],
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket":  { "Fn::Join": [ "-", [ "humio-public", { "Ref": "AWS::Region" } ] ] },
+          "S3Key": "cloudwatch_humio.zip"
+        },
+        "Environment": {
+          "Variables": {
+            "humio_log_ingester_arn": { "Fn::GetAtt" : ["HumioCloudwatchIngester", "Arn"] },
+            "humio_subscription_prefix": { "Ref": "HumioSubscriptionPrefix" },
+            "humio_subscription_backfiller": { "Ref": "HumioSubscriptionBackfiller" }
+          }
+        },
+        "Description": "humio log group auto subscriber",
+        "Handler": "auto_subscriber.lambda_handler",
+        "MemorySize": "128",
+        "Role": { "Fn::GetAtt": [ "HumioLoggingRole", "Arn" ] },
+        "Runtime": "python2.7",
+        "Timeout": "300"
+      }
+    },
+    "HumioAutoSubscriptionPermission": {
+        "Condition" : "CreateAutoSubscriptionResources",
+        "Type" : "AWS::Lambda::Permission",
+        "Properties" : {
+          "Action" : "lambda:InvokeFunction",
+          "FunctionName" : { "Fn::GetAtt" : ["HumioCloudwatchAutoSubscriber", "Arn"] },
+          "Principal": "events.amazonaws.com",
+          "SourceAccount": { "Ref" : "AWS::AccountId" }
+        }
+    },
+    "HumioAutoSubscriptionPermission2": {
+        "Condition" : "CreateAutoSubscriptionResources",
+        "Type" : "AWS::Lambda::Permission",
+        "Properties" : {
+          "Action" : "lambda:InvokeFunction",
+          "FunctionName" : { "Fn::GetAtt" : ["HumioCloudwatchAutoSubscriber", "Arn"] },
+          "Principal": "events.amazonaws.com",
+          "SourceArn": { "Fn::GetAtt" : ["HumioAutoSubscriptionEventRule", "Arn"] }
+        }
+    },
+    "HumioCloudwatchBackfiller": {
+      "DependsOn": ["HumioLoggingRole"],
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket":  { "Fn::Join": [ "-", [ "humio-public", { "Ref": "AWS::Region" } ] ] },
+          "S3Key": "cloudwatch_humio.zip"
+        },
+        "Environment": {
+          "Variables": {
+            "humio_log_ingester_arn": { "Fn::GetAtt" : ["HumioCloudwatchIngester", "Arn"] },
+            "humio_subscription_prefix": { "Ref": "HumioSubscriptionPrefix" },
+            "humio_dataspace_name": { "Ref": "HumioDataspaceName" },
+            "humio_protocol": { "Ref": "HumioProtocol" },
+            "humio_host": { "Ref": "HumioHost" },
+            "humio_ingest_token": { "Ref": "HumioIngestToken" },
+            "humio_subscription_enable": { "Ref": "HumioAutoSubscription" }
+          }
+        },
+        "Description": "humio cloudwatch backfiller",
+        "Handler": "backfiller.lambda_handler",
+        "MemorySize": "128",
+        "Role": { "Fn::GetAtt": [ "HumioLoggingRole", "Arn" ] },
+        "Runtime": "python2.7",
+        "Timeout": "300"
+      }
+    },
+    "HumioCloudwatchBackfillerPermission": {
+        "Type" : "AWS::Lambda::Permission",
+        "Properties" : {
+          "Action" : "lambda:InvokeFunction",
+          "FunctionName" : { "Fn::GetAtt" : ["HumioCloudwatchBackfiller", "Arn"] },
+          "Principal": "logs.amazonaws.com"
+        }
+    },
+    "HumioAutoSubscriptionS3Bucket": {
+      "Type" : "AWS::S3::Bucket",
+      "Condition" : "CreateAutoSubscriptionResources",
+      "Properties" : {
+        "AccessControl" : "BucketOwnerFullControl",
+        "BucketName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::StackName" } , "cloudtrail"]]}
+      }
+    },
+    "HumioAutoSubscriptionS3BucketPolicy" : {
+      "Type" : "AWS::S3::BucketPolicy",
+      "DependsOn": ["HumioAutoSubscriptionS3Bucket"],
+      "Condition" : "CreateAutoSubscriptionResources",
+      "Properties" : {
+        "Bucket" : {"Ref" : "HumioAutoSubscriptionS3Bucket"},
+        "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Sid": "AWSCloudTrailAclCheck20150319",
+                    "Effect": "Allow",
+                    "Principal": {"Service": "cloudtrail.amazonaws.com"},
+                    "Action": "s3:GetBucketAcl",
+                    "Resource": { "Fn::GetAtt": [ "HumioAutoSubscriptionS3Bucket", "Arn" ] } 
+                },
+                {
+                    "Sid": "AWSCloudTrailWrite20150319",
+                    "Effect": "Allow",
+                    "Principal": {"Service": "cloudtrail.amazonaws.com"},
+                    "Action": "s3:PutObject",
+                    "Resource": {"Fn::Join": [ "", [{ "Fn::GetAtt": [ "HumioAutoSubscriptionS3Bucket", "Arn" ] }, "/AWSLogs/" , { "Ref" : "AWS::AccountId" }, "/*" ]]},
+                    "Condition": {"StringEquals": {"s3:x-amz-acl": "bucket-owner-full-control"}}
+                }
+            ]
+        }
+      }
+    },
+    "HumioAutoSubscriptionCloudTrail": {
+      "Type" : "AWS::CloudTrail::Trail",
+      "DependsOn": ["HumioAutoSubscriptionS3BucketPolicy"],
+      "Condition" : "CreateAutoSubscriptionResources",
+      "Properties" : {
+        "EnableLogFileValidation" : false,
+        "IncludeGlobalServiceEvents" : true,
+        "IsMultiRegionTrail" : true,
+        "IsLogging": true,
+        "S3BucketName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::StackName" } , "cloudtrail"]]},
+        "TrailName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::StackName" } ]]}
+      }
+    },
+    "HumioAutoSubscriptionEventRule": {
+      "Type" : "AWS::Events::Rule",
+      "DependsOn": ["HumioCloudwatchAutoSubscriber"],
+      "Condition" : "CreateAutoSubscriptionResources",
+      "Properties" : {
+        "Description" : "Humio log group auto subscription event rule",
+        "EventPattern" : {"source":["aws.logs"],"detail-type":["AWS API Call via CloudTrail"],"detail":{"eventSource":["logs.amazonaws.com"],"eventName":["CreateLogGroup"]}},
+        "Name" : {"Fn::Join": [ "", [ "humio-auto-subscription-rule-", { "Ref": "AWS::StackName" } ]]},
+        "Targets" : [
+          {
+            "Id": {"Fn::Join": [ "", [ "humio-auto-subscription-", { "Ref": "AWS::StackName" } ]]},
+            "Arn": { "Fn::GetAtt": [ "HumioCloudwatchAutoSubscriber", "Arn" ] }
+          }
+        ]
+      }
+    }
+  }
+}
