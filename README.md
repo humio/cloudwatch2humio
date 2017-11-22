@@ -4,7 +4,8 @@ This Humio integration will connect your AWS Cloudwatch Log Groups to an AWS Lam
 
 ## Installation
 
-You can install the cloudwatch2humio integration using the cloudformation template directly or by using our fancy little buttons:
+You can install the cloudwatch2humio integration using the cloudformation template directly or by using our fancy little buttons below. When Cloudformation presents you with the option to name your stack, please be sure to name it something unique as some of the resources we create for you will rely on this value being unique to your organization.
+
 
 **US East 1**:
 [![Install cloudwatch2humio in US East 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in US East 1")](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://s3.amazonaws.com/humio-public-us-east-1/cloudformation.json)
@@ -56,7 +57,7 @@ $ aws cloudformation list-stacks
 
 ## How this integration works
 
-This integration will install three lambas, the `AutoSubscriber`,`CloudwatchIngester` and the `CloudwatchBackfiller`.
+This integration will install three lambas, the `AutoSubscriber`,`CloudwatchIngester` and the `CloudwatchBackfiller`. The cloudformation template will also set up CloudTrail and an S3 bucket for your account. We need to set this up in order to trigger the Auto Subscribtion lambda to newly created log groups.
 
 ### CloudwatchIngester
 
