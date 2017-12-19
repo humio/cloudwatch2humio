@@ -1,5 +1,8 @@
 
-build: target target/cloudwatch_humio.zip
+build: clean target target/cloudwatch_humio.zip
+
+clean:
+	rm -rf target/cloudwatch_humio.zip
 
 init:
 	terraform init
