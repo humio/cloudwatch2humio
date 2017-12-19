@@ -8,13 +8,13 @@ You can install the cloudwatch2humio integration using the cloudformation templa
 
 
 **US East 1**:
-[![Install cloudwatch2humio in US East 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in US East 1")](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://s3.amazonaws.com/humio-public-us-east-1/cloudformation.json)
+[![Install cloudwatch2humio in US East 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in US East 1")](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://humio-public-us-east-1.s3.amazonaws.com/cloudformation.json)
 
 **US East 2**:
-[![Install cloudwatch2humio in US East 2](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in US East 2")](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=cloudwatch2humio&templateURL=https://s3.amazonaws.com/humio-public-us-east-1/cloudformation.json)
+[![Install cloudwatch2humio in US East 2](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in US East 2")](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=cloudwatch2humio&templateURL=https://humio-public-us-east-1.s3.amazonaws.com/cloudformation.json)
 
 **EU Central 1**:
-[![Install cloudwatch2humio in EU Central 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in EU Central 1")](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://s3.amazonaws.com/humio-public-us-east-1/cloudformation.json)
+[![Install cloudwatch2humio in EU Central 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in EU Central 1")](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://humio-public-us-east-1.s3.amazonaws.com/cloudformation.json)
 
 ### Cloudformation
 
