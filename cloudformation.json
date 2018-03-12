@@ -256,7 +256,7 @@
       "Condition" : "CreateAutoSubscriptionResources",
       "Properties" : {
         "AccessControl" : "BucketOwnerFullControl",
-        "BucketName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::StackName" } , "cloudtrail"]]},
+        "BucketName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::AccountId" } , "cloudtrail"]]},
         "NotificationConfiguration": {
         "LambdaConfigurations": [
           {
@@ -319,8 +319,8 @@
         "IncludeGlobalServiceEvents" : true,
         "IsMultiRegionTrail" : true,
         "IsLogging": true,
-        "S3BucketName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::StackName" } , "cloudtrail"]]},
-        "TrailName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::StackName" } ]]}
+        "S3BucketName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::AccountId" } , "cloudtrail"]]},
+        "TrailName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::AccountId" } ]]}
       }
     },
     "HumioAutoSubscriptionEventRule": {
