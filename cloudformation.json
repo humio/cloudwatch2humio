@@ -14,7 +14,7 @@
     "HumioHost": {
       "Type": "String",
       "Description": "The host you want to ship your humio logs to.",
-      "Default": "go.humio.com"
+      "Default": "cloud.humio.com"
     },
     "HumioIngestToken": {
       "Type": "String",
