@@ -28,7 +28,7 @@
         "true",
         "false"
       ],
-      "Default": "false",
+      "Default": "true",
       "Description": "The Humio Ingester will automatically subscribe to new log groups you specify with the prefix below. Set to 'true' to enable."
     },
     "HumioSubscriptionBackfiller": {
