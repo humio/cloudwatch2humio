@@ -6,14 +6,20 @@ This Humio integration will connect your AWS Cloudwatch Log Groups to an AWS Lam
 
 You can install the cloudwatch2humio integration using the cloudformation template directly or by using our fancy little buttons below. When Cloudformation presents you with the option to name your stack, please be sure to name your stack with a unique value. Some of the resources we create using this template are using a shared namespace across all other AWS users so leaving this value set to `cloudwatch2humio` will collide with existing resources and cause a stack creation failure.
 
-**US East 1**:
+**US East (N. Virginia)	- US East 1**:
 [![Install cloudwatch2humio in US East 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in US East 1")](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://humio-public-us-east-1.s3.amazonaws.com/cloudformation.json)
 
-**US East 2**:
+**US East (Ohio) - US East 2**:
 [![Install cloudwatch2humio in US East 2](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in US East 2")](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=cloudwatch2humio&templateURL=https://humio-public-us-east-1.s3.amazonaws.com/cloudformation.json)
 
-**EU Central 1**:
+**US West (Oregon) - US West 2**:
+[![Install cloudwatch2humio in US West 2](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in US West 2")](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=cloudwatch2humio&templateURL=https://humio-public-us-east-1.s3.amazonaws.com/cloudformation.json)
+
+**EU (Frankfurt) - EU Central 1**:
 [![Install cloudwatch2humio in EU Central 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in EU Central 1")](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://humio-public-us-east-1.s3.amazonaws.com/cloudformation.json)
+
+**EU (Ireland) - EU West 1**
+[![Install cloudwatch2humio in EU West 1](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png "Install cloudwatch2humio in EU West 1")](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=cloudwatch2humio&templateURL=https://humio-public-us-east-1.s3.amazonaws.com/cloudformation.json)
 
 ### Cloudformation
 
