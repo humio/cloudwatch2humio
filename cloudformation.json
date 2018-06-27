@@ -254,7 +254,7 @@
         "IncludeGlobalServiceEvents" : true,
         "IsMultiRegionTrail" : true,
         "IsLogging": true,
-        "S3BucketName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::AccountId" } , "cloudtrail"]]},
+        "S3BucketName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::StackName" } , "cloudtrail"]]},
         "TrailName" : {"Fn::Join": [ "-", [ "humio", { "Ref": "AWS::AccountId" } ]]}
       }
     },
