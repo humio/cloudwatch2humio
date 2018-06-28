@@ -6,5 +6,5 @@ to Humio.
 
 For usage documentation see:
 
-https://dock.humio.com/integrations/platform-integrations/aws-cloudwatch/
+https://docs.humio.com/integrations/platform-integrations/aws-cloudwatch/
 
