@@ -7,6 +7,7 @@ import helpers
 # False when setup has not been performed.
 _is_setup = False
 
+_is_setup = False
 
 def setup():
     """
