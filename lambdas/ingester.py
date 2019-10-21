@@ -5,7 +5,8 @@ import json
 import os
 import time
 import calendar
-import urllib2
+import urllib.request as urlRequest
+import urllib.parse as parse
 import datetime
 import base64
 import gzip
@@ -42,11 +43,11 @@ def lambda_handler(event, context):
     }
 
     # decode and unzip the log data
-    decoded_json_event = gzip.GzipFile(fileobj=StringIO(event['awslogs']['data'].decode('base64','strict'))).read()
+    decoded_json_event = gzip.decompress(base64.b64decode(event['awslogs']['data']))
     decoded_event = json.loads(decoded_json_event)
 
     # debug output
-    print("Event from Cloudwatch: %s" % (json.dumps(decoded_event)))
+    print(f"Event from Cloudwatch: {decoded_event}")
 
 
     # Extract general attributes from the event batch
@@ -89,12 +90,14 @@ def lambda_handler(event, context):
 
     # Make a batch for the Humio ingest API
     wrapped_data = [{ 'tags': {'host':'lambda'}, 'events': humio_events }]
+    wrapped_data=json.dumps(wrapped_data)
+    request_data=wrapped_data.encode()
 
     # prepare request
-    request = urllib2.Request(humio_url, json.dumps(wrapped_data), humio_headers)
+    request = urlRequest.Request(humio_url, request_data, humio_headers)
 
     # ship request
-    f = urllib2.urlopen(request)
+    f = urlRequest.urlopen(request)
 
     # read response
     response = f.read()
