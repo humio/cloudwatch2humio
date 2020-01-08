@@ -1,8 +1,3 @@
-def decode_event(event):
-    decoded_json_event = gzip.GzipFile(fileobj=StringIO(event['awslogs']['data'].decode('base64','strict'))).read()
-    decoded_event = json.loads(decoded_json_event)
-    return decoded_event
-
 def create_subscription(log_client, log_group_name, humio_log_ingester_arn, context):
     
     # can't subscribe to the log group that our stdout/err goes to
