@@ -5,15 +5,28 @@ import json
 import os
 import time
 import calendar
-import urllib2
 import datetime
 import base64
 import gzip
 import boto3
 from time import sleep
 
-from StringIO import StringIO
 from datetime import tzinfo
+
+import sys
+if sys.version_info >= (3,2):
+    # Python 3 imports
+    from urllib.request import Request, urlopen
+    
+    # gzip decompress was introduced in python 3.2 - earlier 3.X versions are therefore not supported
+    def gzip_decode(event):
+        return gzip.decompress(base64.b64decode(event['awslogs']['data']))
+else:
+    # Old Python 2.7 imports
+    from urllib2 import Request, urlopen
+    from StringIO import StringIO
+    def gzip_decode(event):
+        return gzip.GzipFile(fileobj=StringIO(event['awslogs']['data'].decode('base64','strict'))).read()
 
 
 ################################################################################
@@ -42,7 +55,7 @@ def lambda_handler(event, context):
     }
 
     # decode and unzip the log data
-    decoded_json_event = gzip.GzipFile(fileobj=StringIO(event['awslogs']['data'].decode('base64','strict'))).read()
+    decoded_json_event = gzip_decode(event)
     decoded_event = json.loads(decoded_json_event)
 
     # debug output
@@ -91,11 +104,9 @@ def lambda_handler(event, context):
     wrapped_data = [{ 'tags': {'host':'lambda'}, 'events': humio_events }]
 
     # prepare request
-    request = urllib2.Request(humio_url, json.dumps(wrapped_data), humio_headers)
-
+    request = Request(humio_url, json.dumps(wrapped_data).encode(), humio_headers)
     # ship request
-    f = urllib2.urlopen(request)
-
+    f = urlopen(request)
     # read response
     response = f.read()
 
@@ -151,5 +162,3 @@ def parse_message(message):
 
 # This is a seperate handler and not called at all through the normal ingestion execution flow
 # update subscriptions before our next run
-
-
