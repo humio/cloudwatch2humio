@@ -5,8 +5,6 @@ import os
 import helpers
 from time import sleep
 
-from StringIO import StringIO
-
 # setup log client
 log_client = boto3.client('logs')
 
