@@ -1,0 +1,10 @@
+[
+    {
+        "ParameterKey": "HumioDataspaceName",
+        "ParameterValue": "sandbox"
+    },
+    {
+        "ParameterKey": "HumioIngestToken",
+        "ParameterValue": "AAOBANzjmTNPUrgB0vyFqPqFfi9K6USRb1kWX3E9fEOu"
+    }
+]
