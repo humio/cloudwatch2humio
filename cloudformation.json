@@ -1,9 +1,9 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {
-    "HumioDataspaceName": {
+    "HumioRepositoryName": {
       "Type": "String",
-      "Description": "The name of your dataspace in humio that you want to ship logs to.",
+      "Description": "The name of your repostiory in humio that you want to ship logs to.",
       "Default": ""
     },
     "HumioProtocol": {
@@ -108,7 +108,7 @@
         },
         "Environment": {
           "Variables": {
-            "humio_dataspace_name": { "Ref": "HumioDataspaceName" },
+            "humio_repository_name": { "Ref": "HumioRepositoryName" },
             "humio_protocol": { "Ref": "HumioProtocol" },
             "humio_host": { "Ref": "HumioHost" },
             "humio_ingest_token": { "Ref": "HumioIngestToken" },
@@ -186,7 +186,7 @@
           "Variables": {
             "humio_log_ingester_arn": { "Fn::GetAtt" : ["HumioCloudwatchIngester", "Arn"] },
             "humio_subscription_prefix": { "Ref": "HumioSubscriptionPrefix" },
-            "humio_dataspace_name": { "Ref": "HumioDataspaceName" },
+            "humio_repository_name": { "Ref": "HumioRepositoryName" },
             "humio_protocol": { "Ref": "HumioProtocol" },
             "humio_host": { "Ref": "HumioHost" },
             "humio_ingest_token": { "Ref": "HumioIngestToken" },

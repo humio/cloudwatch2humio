@@ -1,26 +1,36 @@
 import boto3
-import gzip
-import json
 import os
 import helpers
 
+# Set environment variables.
+humio_log_ingester_arn = os.environ['humio_log_ingester_arn']
+humio_subscription_prefix = os.environ['humio_subscription_prefix']
+
+# Set up CloudWatch Logs client.
+log_client = boto3.client('logs')
+
+
 def lambda_handler(event, context):
-    
-    # setup log client
-    log_client = boto3.client('logs')
+    """
+    Auto-subscribe to log group from event.
 
-    # grab log group name from incoming event
-    log_group_name = event['detail']['requestParameters']['logGroupName'] 
+    :param event: Event data from CloudWatch Logs.
+    :type event: dict
 
-    # env vars 
-    humio_log_ingester_arn = os.environ['humio_log_ingester_arn']
-    humio_subscription_prefix = os.environ['humio_subscription_prefix']
+    :param context: Lambda object context.
+    :type context: obj
+
+    :return: None
+    :rtype: NoneType
+    """
+    # Grab the log group name from incoming event.
+    log_group_name = event['detail']['requestParameters']['logGroupName']
   
-    # check if the prefix is empty
+    # Check whether the prefix is empty.
     if not humio_subscription_prefix:
         helpers.create_subscription(log_client, log_group_name, humio_log_ingester_arn, context)
 
     else:
-        # check if log group name starts with our prefix
+        # Check whether the log group's name starts with our prefix.
         if log_group_name.startswith(humio_subscription_prefix):
             helpers.create_subscription(log_client, log_group_name, humio_log_ingester_arn, context)
