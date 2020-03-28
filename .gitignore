@@ -1,5 +1,5 @@
 *.swp
 *.iml
-*.idea
+.idea
 target/
 parameters.json
