@@ -1,3 +1,7 @@
 *.swp
 *.iml
+.idea
+.vscode/
+venv/
 target/
+parameters.json
