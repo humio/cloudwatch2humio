@@ -10,7 +10,7 @@ def decode_event(event):
     :param event: CloudWatch Log event.
     :type event: obj
 
-    :return: Unzipped and decoded event.
+    :return: Unzipped and decoded event.6
     :rtype: JSON
     """
     decoded_json_event = gzip.GzipFile(
@@ -39,22 +39,22 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
 
     :return: None
     """
-    # We cannot subscribe to the log group that our stdout/err goes to.
+    # We cannot subscribe to the log group that our stdout/err goes to. TODO: What does this mean?
     if context.log_group_name == log_group_name:
-        print("Skipping our own log group name...")
+        print('Skipping our own log group name...')
     else:
-        print("Creating subscription for %s" % log_group_name)
+        print('Creating subscription for %s' % log_group_name)
     try:
         log_client.put_subscription_filter(
             logGroupName=log_group_name,
-            filterName="%s-humio_ingester" % log_group_name,
-            filterPattern='',
+            filterName='%s-humio_ingester' % log_group_name,
+            filterPattern='',  # Matching everything.
             destinationArn=humio_log_ingester_arn,
-            distribution='ByLogStream'
+            # distribution='ByLogStream' TODO: This should not be set when the destination is a lambda?
         )
         print('Successfully subscribed to %s!' % log_group_name)
-    except Exception as e:
-        print('Error creating subscription to %s. Exception: %s' % (log_group_name, e))
+    except Exception as exception:
+        print('Error creating subscription to %s. Exception: %s' % (log_group_name, exception))
 
 
 def delete_subscription(log_client, log_group_name, filter_name):
@@ -72,7 +72,7 @@ def delete_subscription(log_client, log_group_name, filter_name):
 
     :return: None
     """
-    print("Deleting subscription for %s" % log_group_name)
+    print('Deleting subscription for %s' % log_group_name)
     log_client.delete_subscription_filter(
         logGroupName=log_group_name,
         filterName=filter_name
