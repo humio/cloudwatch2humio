@@ -1,14 +1,35 @@
-from __future__ import print_function
 import re
 import json
 import os
-import urllib2
+import requests
 import helpers
 
-humio_host = os.environ['humio_host']
-humio_protocol = os.environ['humio_protocol']
-humio_repository = os.environ['humio_repository_name']
-humio_ingest_token = os.environ['humio_ingest_token']
+# False when setup has not been performed.
+_is_setup = False
+
+
+def setup():
+    """
+    Sets up variables that should persists across Lambda invocations.
+
+    :return: None
+    :rtype: NoneType
+    """
+    global humio_host
+    global humio_protocol
+    global humio_repository
+    global humio_ingest_token
+    global http_session
+
+    humio_host = os.environ['humio_host']
+    humio_protocol = os.environ['humio_protocol']
+    humio_repository = os.environ['humio_repository_name']
+    humio_ingest_token = os.environ['humio_ingest_token']
+
+    http_session = requests.session()
+
+    global _is_setup
+    _is_setup = True
 
 
 def lambda_handler(event, context):
@@ -24,6 +45,10 @@ def lambda_handler(event, context):
     :return: None
     :rtype: NoneType
     """
+    # TODO: Is there a better way?
+    if not _is_setup:
+        setup()
+
     # TODO: Use Python Client.
     humio_url = '%s://%s/api/v1/dataspaces/%s/ingest' % (humio_protocol, humio_host, humio_repository)
     humio_headers = {
@@ -35,7 +60,7 @@ def lambda_handler(event, context):
     decoded_event = helpers.decode_event(event)
 
     # Debug output.
-    print("Event from CloudWatch Logs: %s" % (json.dumps(decoded_event)))
+    print('Event from CloudWatch Logs: %s' % (json.dumps(decoded_event)))
 
     # Extract the general attributes from the event batch.
     batch_attrs = {
@@ -49,7 +74,7 @@ def lambda_handler(event, context):
     # Parse out the service name.
     log_group_parser = re.compile('^/aws/(lambda|apigateway)/(.*)')
  
-    parsed_log_group = log_group_parser.match(decoded_event.get('logGroup', ""))
+    parsed_log_group = log_group_parser.match(decoded_event.get('logGroup', ''))
     if parsed_log_group:
         batch_attrs.update(
             {
@@ -79,24 +104,14 @@ def lambda_handler(event, context):
     # Make a batch for the Humio Ingest API.
     wrapped_data = [{'tags': {'host': 'lambda'}, 'events': humio_events}]
 
-    # Prepare request.
-    # TODO: Use requests library instead, see PR!
-    request = urllib2.Request(
+    # Make request.
+    request = http_session.post(
         humio_url,
-        json.dumps(wrapped_data),
-        humio_headers
+        data=json.dumps(wrapped_data),
+        headers=humio_headers
     )
 
-    # Ship request.
-    f = urllib2.urlopen(request)
-
-    # Read response.
-    response = f.read()
-
-    # Close handler.
-    # QUESTION: Can we reuse this handler between lambda invocations?
-    # TODO: Check whether this is fixed after changing to the requests library.
-    f.close()
+    response = request.text
 
     # Debug output.
     print('Got response %s from Humio' % response)
@@ -149,7 +164,7 @@ def parse_message(message):
     m = None
     
     # Determine which matcher to use depending on the message type.
-    # TODO: Is there are prettier way to do this?
+    # TODO: Is there a better/prettier way to do this?
     if message.startswith('END'):
         m = end_matcher.match(message)
     elif message.startswith('START'):
