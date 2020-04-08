@@ -1,6 +1,7 @@
 import gzip
 import json
 import base64
+import re
 
 
 def decode_event(event):
@@ -74,3 +75,64 @@ def delete_subscription(log_client, log_group_name, filter_name):
         filterName=filter_name
     )
 
+
+def parse_message(message):
+    """
+    Simple CloudWatch Logs parser.
+
+    :param message: Log event message.
+    :type message: str
+
+    :return: Parsed message or empty.
+    :rtype: dict
+    """
+    m = None
+
+    # Determine which matcher to use depending on the message type.
+    if message.startswith('END'):
+        m = end_matcher.match(message)
+    elif message.startswith('START'):
+        m = start_matcher.match(message)
+    elif message.startswith('REPORT'):
+        m = report_matcher.match(message)
+    else:
+        m = std_matcher.match(message)
+
+    if m:
+        return m.groupdict()
+    else:
+        return {}
+
+
+# Standard out from Lambdas.
+std_matcher = re.compile(
+    '\d\d\d\d-\d\d-\d\d\S+\s+(?P<request_id>\S+)'
+)
+
+
+# END RequestId: b3be449c-8bd7-11e7-bb30-4f271af95c46
+end_matcher = re.compile(
+    'END RequestId:\s+(?P<request_id>\S+)'
+)
+
+
+# START RequestId: b3be449c-8bd7-11e7-bb30-4f271af95c46
+# Version: $LATEST
+start_matcher = re.compile(
+    'START RequestId:\s+(?P<request_id>\S+)\s+'
+    'Version: (?P<version>\S+)'
+)
+
+
+# REPORT RequestId: b3be449c-8bd7-11e7-bb30-4f271af95c46
+# Duration: 0.47 ms
+# Billed Duration: 100 ms
+# Memory Size: 128 MB
+# Max Memory Used: 20 MB
+report_matcher = re.compile(
+    'REPORT RequestId:\s+(?P<request_id>\S+)\s+'
+    'Duration: (?P<duration>\S+) ms\s+'
+    'Billed Duration: (?P<billed_duration>\S+) ms\s+'
+    'Memory Size: (?P<memory_size>\S+) MB\s+'
+    'Max Memory Used: (?P<max_memory>\S+) MB'
+)
