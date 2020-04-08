@@ -48,11 +48,12 @@ def lambda_handler(event, context):
     # If we have a next token, recursively fire another instance of backfiller with it.
     # This is to look through all events.
     if 'nextToken' in log_groups.keys():
-        lambda_cli = boto3.client("lambda")
+        lambda_client = boto3.client("lambda")
         event['nextToken'] = log_groups['nextToken']
-        lambda_cli.invoke_async(  # TODO: Check whether the invoke_async is deprecated!
+        lambda_client.invoke(
             FunctionName=context.function_name,
-            InvokeArgs=json.dumps(event)
+            InvocationType='Event',
+            Payload=json.dumps(event)
         )
 
     # Loop through log groups.
