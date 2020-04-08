@@ -45,7 +45,6 @@ def lambda_handler(event, context):
     :return: None
     :rtype: NoneType
     """
-    # TODO: Is there a better way?
     if not _is_setup:
         setup()
 
