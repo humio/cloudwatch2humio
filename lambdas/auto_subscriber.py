@@ -26,11 +26,11 @@ def lambda_handler(event, context):
     # Grab the log group name from incoming event.
     log_group_name = event['detail']['requestParameters']['logGroupName']
   
-    # Check whether the prefix is empty.
+    # Check whether the prefix is set - the prefix is used to determine which logs we want.
     if not humio_subscription_prefix:
         helpers.create_subscription(log_client, log_group_name, humio_log_ingester_arn, context)
 
     else:
-        # Check whether the log group's name starts with our prefix.
+        # Check whether the log group's name starts with the set prefix.
         if log_group_name.startswith(humio_subscription_prefix):
             helpers.create_subscription(log_client, log_group_name, humio_log_ingester_arn, context)
