@@ -1,7 +1,7 @@
 import re
 import json
 import os
-import requests
+from botocore.vendored import requests  # TODO: Use the requests library.
 import helpers
 
 # False when setup has not been performed.
@@ -73,7 +73,6 @@ def lambda_handler(event, context):
 
     # Parse out the service name.
     log_group_parser = re.compile('^/aws/(lambda|apigateway)/(.*)')
- 
     parsed_log_group = log_group_parser.match(decoded_event.get('logGroup', ''))
     if parsed_log_group:
         batch_attrs.update(
@@ -107,14 +106,14 @@ def lambda_handler(event, context):
     # Make request.
     request = http_session.post(
         humio_url,
-        data=json.dumps(wrapped_data),
+        data=json.dumps(wrapped_data).encode(),  # encode might not be necessary.
         headers=humio_headers
     )
 
     response = request.text
 
     # Debug output.
-    print('Got response %s from Humio' % response)
+    print('Got response %s from Humio.' % response)
 
 
 # Standard out from Lambdas.
@@ -162,9 +161,8 @@ def parse_message(message):
     :rtype: dict
     """
     m = None
-    
+
     # Determine which matcher to use depending on the message type.
-    # TODO: Is there a better/prettier way to do this?
     if message.startswith('END'):
         m = end_matcher.match(message)
     elif message.startswith('START'):

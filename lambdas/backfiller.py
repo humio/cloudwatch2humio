@@ -25,16 +25,14 @@ def lambda_handler(event, context):
     :return: None
     :rtype: NoneType
     """
-    # Grab all log groups with a token if we have it.
+    # Grab all log groups with a token and/or prefix if we have them.
     if 'nextToken' in event.keys():
         next_token = event['nextToken']
-
         if humio_subscription_prefix:
             log_groups = log_client.describe_log_groups(
                 logGroupNamePrefix=humio_subscription_prefix,
                 nextToken=next_token
             )
-
         else:
             log_groups = log_client.describe_log_groups(
                 nextToken=next_token
@@ -52,21 +50,27 @@ def lambda_handler(event, context):
     if 'nextToken' in log_groups.keys():
         lambda_cli = boto3.client("lambda")
         event['nextToken'] = log_groups['nextToken']
-        lambda_cli.invoke_async(FunctionName=context.function_name, InvokeArgs=json.dumps(event))
+        lambda_cli.invoke_async(  # TODO: Check whether the invoke_async is deprecated!
+            FunctionName=context.function_name,
+            InvokeArgs=json.dumps(event)
+        )
 
-    # Loop through log groups (for the batch).
+    # Loop through log groups.
     for log_group in log_groups['logGroups']:
         # Grab all subscriptions for the specified log group.
         all_subscription_filters = log_client.describe_subscription_filters(
             logGroupName=log_group['logGroupName']
-      )
+        )
 
+        # TODO: We are deleting other subscription filters, is this because there can be only one?
+        #  Isn't this bad in some cases?
         # First we check to see if there are any filters at all.
         if all_subscription_filters['subscriptionFilters']:
             # If our function is not subscribed, delete subscription and create ours.
             if all_subscription_filters['subscriptionFilters'][0]['destinationArn'] != humio_log_ingester_arn:
                 helpers.delete_subscription(
-                    log_client, log_group['logGroupName'],
+                    log_client,
+                    log_group['logGroupName'],
                     all_subscription_filters['subscriptionFilters'][0]['filterName']
                 )
                 helpers.create_subscription(
@@ -76,9 +80,8 @@ def lambda_handler(event, context):
                     context
                 )
             # We are now subscribed.
-            else:  # we are already subscribed.
-                print("We are subscribed to %s" % log_group['logGroupName'])
-
+            else:
+                print("We are already subscribed to %s" % log_group['logGroupName'])
         # When there are no subscription filters, let us subscribe!
         else:
             helpers.create_subscription(
@@ -88,5 +91,5 @@ def lambda_handler(event, context):
             )
 
         # Keep hitting rate limits?
-        # TODO: Find actual limits and back off using those, and understand what this means?!
+        # TODO: Find actual limits and back off using those.
         sleep(0.8)

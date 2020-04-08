@@ -1,6 +1,6 @@
 import gzip
 import json
-from StringIO import StringIO
+import base64
 
 
 def decode_event(event):
@@ -13,11 +13,7 @@ def decode_event(event):
     :return: Unzipped and decoded event.6
     :rtype: JSON
     """
-    decoded_json_event = gzip.GzipFile(
-        fileobj=StringIO(
-            event['awslogs']['data'].decode('base64', 'strict')
-        )
-    ).read()
+    decoded_json_event = gzip.decompress(base64.b64decode(event['awslogs']['data']))
     decoded_event = json.loads(decoded_json_event)
     return decoded_event
 
@@ -50,7 +46,7 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
             filterName='%s-humio_ingester' % log_group_name,
             filterPattern='',  # Matching everything.
             destinationArn=humio_log_ingester_arn,
-            # distribution='ByLogStream' TODO: This should not be set when the destination is a lambda?
+            # distribution='ByLogStream' TODO: This does not need to be set when the destination is a lambda?
         )
         print('Successfully subscribed to %s!' % log_group_name)
     except Exception as exception:
