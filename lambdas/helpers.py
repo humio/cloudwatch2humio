@@ -47,7 +47,7 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
             filterName="%s-humio_ingester" % log_group_name,
             filterPattern="",  # Matching everything.
             destinationArn=humio_log_ingester_arn,
-            # distribution="ByLogStream" TODO: This does not need to be set when the destination is a lambda?
+            distribution="ByLogStream"
         )
         print("Successfully subscribed to %s!" % log_group_name)
     except Exception as exception:
