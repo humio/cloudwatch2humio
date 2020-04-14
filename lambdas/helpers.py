@@ -36,7 +36,7 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
 
     :return: None
     """
-    # We cannot subscribe to the log group that our stdout/err goes to. TODO: What does this mean?
+    # We cannot subscribe to the log group that our stdout/err goes to.
     if context.log_group_name == log_group_name:
         print("Skipping our own log group name...")
     else:

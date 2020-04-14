@@ -63,8 +63,6 @@ def lambda_handler(event, context):
             logGroupName=log_group["logGroupName"]
         )
 
-        # TODO: We are deleting other subscription filters, is this because there can be only one?
-        #  Isn't this bad in some cases?
         # First we check to see if there are any filters at all.
         if all_subscription_filters["subscriptionFilters"]:
             # If our function is not subscribed, delete subscription and create ours.
