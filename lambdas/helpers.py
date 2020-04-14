@@ -45,9 +45,9 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
         log_client.put_subscription_filter(
             logGroupName=log_group_name,
             filterName="%s-humio_ingester" % log_group_name,
-            filterPattern='',  # Matching everything.
+            filterPattern="",  # Matching everything.
             destinationArn=humio_log_ingester_arn,
-            # distribution='ByLogStream' TODO: This does not need to be set when the destination is a lambda?
+            # distribution="ByLogStream" TODO: This does not need to be set when the destination is a lambda?
         )
         print("Successfully subscribed to %s!" % log_group_name)
     except Exception as exception:
@@ -69,7 +69,7 @@ def delete_subscription(log_client, log_group_name, filter_name):
 
     :return: None
     """
-    print('Deleting subscription for %s' % log_group_name)
+    print("Deleting subscription for %s" % log_group_name)
     log_client.delete_subscription_filter(
         logGroupName=log_group_name,
         filterName=filter_name
