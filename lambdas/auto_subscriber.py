@@ -4,7 +4,7 @@ import helpers
 
 # Set environment variables.
 humio_log_ingester_arn = os.environ["humio_log_ingester_arn"]
-humio_subscription_prefix = os.environ["humio_subscription_prefix"]
+humio_subscription_prefix = os.environ.get("humio_subscription_prefix")
 
 # Set up CloudWatch Logs client.
 log_client = boto3.client("logs")
