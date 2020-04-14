@@ -160,7 +160,7 @@
             "humio_subscription_backfiller" : { "Ref" : "HumioSubscriptionBackfiller" }
           }
         },
-        "Description" : "CloudWatch Logs to Humio ingester log group auto subscriber.",
+        "Description" : "CloudWatch Logs to Humio log group auto subscriber.",
         "Handler" : "auto_subscriber.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
