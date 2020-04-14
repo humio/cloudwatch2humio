@@ -5,11 +5,11 @@ import helpers
 from time import sleep
 
 # Set environment variables.
-humio_log_ingester_arn = os.environ['humio_log_ingester_arn']
-humio_subscription_prefix = os.environ['humio_subscription_prefix']
+humio_log_ingester_arn = os.environ["humio_log_ingester_arn"]
+humio_subscription_prefix = os.environ["humio_subscription_prefix"]
 
 # Set up CloudWatch Logs client.
-log_client = boto3.client('logs')
+log_client = boto3.client("logs")
 
 
 def lambda_handler(event, context):
@@ -26,8 +26,8 @@ def lambda_handler(event, context):
     :rtype: NoneType
     """
     # Grab all log groups with a token and/or prefix if we have them.
-    if 'nextToken' in event.keys():
-        next_token = event['nextToken']
+    if "nextToken" in event.keys():
+        next_token = event["nextToken"]
         if humio_subscription_prefix:
             log_groups = log_client.describe_log_groups(
                 logGroupNamePrefix=humio_subscription_prefix,
@@ -47,47 +47,47 @@ def lambda_handler(event, context):
 
     # If we have a next token, recursively fire another instance of backfiller with it.
     # This is to look through all events.
-    if 'nextToken' in log_groups.keys():
-        lambda_client = boto3.client('lambda')
-        event['nextToken'] = log_groups['nextToken']
+    if "nextToken" in log_groups.keys():
+        lambda_client = boto3.client("lambda")
+        event["nextToken"] = log_groups["nextToken"]
         lambda_client.invoke(
             FunctionName=context.function_name,
-            InvocationType='Event',
+            InvocationType="Event",
             Payload=json.dumps(event)
         )
 
     # Loop through log groups.
-    for log_group in log_groups['logGroups']:
+    for log_group in log_groups["logGroups"]:
         # Grab all subscriptions for the specified log group.
         all_subscription_filters = log_client.describe_subscription_filters(
-            logGroupName=log_group['logGroupName']
+            logGroupName=log_group["logGroupName"]
         )
 
         # TODO: We are deleting other subscription filters, is this because there can be only one?
         #  Isn't this bad in some cases?
         # First we check to see if there are any filters at all.
-        if all_subscription_filters['subscriptionFilters']:
+        if all_subscription_filters["subscriptionFilters"]:
             # If our function is not subscribed, delete subscription and create ours.
-            if all_subscription_filters['subscriptionFilters'][0]['destinationArn'] != humio_log_ingester_arn:
+            if all_subscription_filters["subscriptionFilters"][0]["destinationArn"] != humio_log_ingester_arn:
                 helpers.delete_subscription(
                     log_client,
-                    log_group['logGroupName'],
-                    all_subscription_filters['subscriptionFilters'][0]['filterName']
+                    log_group["logGroupName"],
+                    all_subscription_filters["subscriptionFilters"][0]["filterName"]
                 )
                 helpers.create_subscription(
                     log_client,
-                    log_group['logGroupName'],
+                    log_group["logGroupName"],
                     humio_log_ingester_arn,
                     context
                 )
             # We are now subscribed.
             else:
-                print('We are already subscribed to %s' % log_group['logGroupName'])
+                print("We are already subscribed to %s" % log_group["logGroupName"])
         # When there are no subscription filters, let us subscribe!
         else:
             helpers.create_subscription(
                 log_client,
-                log_group['logGroupName'],
+                log_group["logGroupName"],
                 humio_log_ingester_arn, context
             )
 
