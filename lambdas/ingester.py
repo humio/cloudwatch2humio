@@ -9,6 +9,7 @@ import datetime
 import base64
 import gzip
 import boto3
+from botocore.vendored import requests
 from time import sleep
 
 from datetime import tzinfo
@@ -34,22 +35,34 @@ else:
             fileobj=StringIO(event["awslogs"]["data"].decode("base64", "strict"))
         ).read()
 
+_is_setup = False
 
-################################################################################
-### The main handler ###########################################################
-################################################################################
-
-
-def lambda_handler(event, context):
-
-    ################################################################################
-    ### Parameters for the lambda ##################################################
-    ################################################################################
+def setup():
+    """Sets up variables that should persist across Lambda invocations."""
+    global humio_host
+    global humio_protocol
+    global humio_dataspace
+    global humio_ingest_token
+    global http_session
 
     humio_host = os.environ["humio_host"]
     humio_protocol = os.environ["humio_protocol"]
     humio_dataspace = os.environ["humio_dataspace_name"]
     humio_ingest_token = os.environ["humio_ingest_token"]
+
+    http_session = requests.Session()
+
+    global _is_setup
+    _is_setup = True
+
+
+################################################################################
+### The main handler ###########################################################
+################################################################################
+
+def lambda_handler(event, context):
+    if not _is_setup:
+        setup()
 
     ################################################################################
     ### Global variables ###########################################################
@@ -116,16 +129,13 @@ def lambda_handler(event, context):
     # Make a batch for the Humio ingest API
     wrapped_data = [{"tags": {"host": "lambda"}, "events": humio_events}]
 
-    # prepare request
-    request = Request(humio_url, json.dumps(wrapped_data).encode(), humio_headers)
-    # ship request
-    f = urlopen(request)
-    # read response
-    response = f.read()
+    # make request
+    request = http_session.post(
+            humio_url,
+            data=json.dumps(wrapped_data),
+            headers=humio_headers)
 
-    # close handler
-    # QUESTION: can we reuse this handler between lambda invocations?
-    f.close()
+    response = request.text
 
     # debug output
     print("got response %s from humio" % response)
