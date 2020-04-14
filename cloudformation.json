@@ -289,9 +289,7 @@
     },
     "HumioAutoSubscriptionCloudTrail" : {
       "Type" : "AWS::CloudTrail::Trail",
-      "DependsOn" : [
-        "HumioAutoSubscriptionS3BucketPolicy"
-      ],
+      "DependsOn" : [ "HumioAutoSubscriptionS3BucketPolicy" ],
       "Condition" : "CreateAutoSubscriptionResources",
       "Properties" : {
         "EnableLogFileValidation" : false,
