@@ -117,15 +117,15 @@
             "humio_repository_name" : { "Ref" : "HumioRepositoryName" },
             "humio_protocol" : { "Ref" : "HumioProtocol" },
             "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token": { "Ref": "HumioIngestToken" },
-            "humio_subscription_enable": { "Ref": "HumioAutoSubscription" }
+            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
+            "humio_subscription_enable" : { "Ref" : "HumioAutoSubscription" }
           }
         },
         "Description" : "CloudWatch Logs to Humio ingester.",
         "Handler" : "ingester.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
-          "Fn::GetAtt": [ "HumioLoggingRole", "Arn" ]
+          "Fn::GetAtt" : [ "HumioLoggingRole", "Arn" ]
         },
         "Runtime" : "python3.8",
         "Timeout" : "300"
@@ -245,13 +245,13 @@
       "Properties" : {
         "AccessControl" : "BucketOwnerFullControl",
         "BucketName" : {
-          "Fn::Join": [ "-", [ "humio", { "Ref": "AWS::StackName" } , "cloudtrail" ] ]
+          "Fn::Join" : [ "-", [ "humio", { "Ref" : "AWS::StackName" } , "cloudtrail" ] ]
         }
       }
     },
     "HumioAutoSubscriptionS3BucketPolicy" : {
       "Type" : "AWS::S3::BucketPolicy",
-      "DependsOn": [ "HumioAutoSubscriptionS3Bucket" ],
+      "DependsOn" : [ "HumioAutoSubscriptionS3Bucket" ],
       "Condition" : "CreateAutoSubscriptionResources",
       "Properties" : {
         "Bucket" : { "Ref" : "HumioAutoSubscriptionS3Bucket" },
@@ -270,17 +270,17 @@
               }
             },
             {
-              "Sid": "AWSCloudTrailWrite20150319",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "cloudtrail.amazonaws.com"
+              "Sid" : "AWSCloudTrailWrite20150319",
+              "Effect" : "Allow",
+              "Principal" : {
+                "Service" : "cloudtrail.amazonaws.com"
               },
-              "Action": "s3:PutObject",
-              "Resource": {
-                "Fn::Join": [ "", [ { "Fn::GetAtt": [ "HumioAutoSubscriptionS3Bucket", "Arn" ] }, "/AWSLogs/", { "Ref": "AWS::AccountId" }, "/*" ] ]
+              "Action" : "s3:PutObject",
+              "Resource" : {
+                "Fn::Join" : [ "", [ { "Fn::GetAtt" : [ "HumioAutoSubscriptionS3Bucket", "Arn" ] }, "/AWSLogs/", { "Ref" : "AWS::AccountId" }, "/*" ] ]
               },
-              "Condition": {
-                "StringEquals": { "s3:x-amz-acl": "bucket-owner-full-control" }
+              "Condition" : {
+                "StringEquals" : { "s3:x-amz-acl" : "bucket-owner-full-control" }
               }
             }
           ]
@@ -321,7 +321,7 @@
         "Name" : {
           "Fn::Join" : [ "", [ "humio-auto-subscription-rule-", { "Ref" : "AWS::StackName" } ] ]
         },
-        "Targets": [
+        "Targets" : [
           {
             "Id" : {
               "Fn::Join" : [ "", [ "humio-auto-subscription-", { "Ref" : "AWS::StackName" } ] ]
