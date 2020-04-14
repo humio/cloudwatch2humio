@@ -63,11 +63,11 @@ def lambda_handler(event, context):
 
     # Extract the general attributes from the event batch.
     batch_attrs = {
-        'owner': decoded_event.get('owner', 'undefined'),
-        'logGroup': decoded_event.get('logGroup', 'undefined'),
-        'logStream': decoded_event.get('logStream', 'undefined'),
-        'messageType': decoded_event.get('messageType', 'undefined'),
-        'subscriptionFilters': decoded_event.get('subscriptionFilters', 'undefined')
+        "owner": decoded_event.get("owner", "undefined"),
+        "logGroup": decoded_event.get("logGroup", "undefined"),
+        "logStream": decoded_event.get("logStream", "undefined"),
+        "messageType": decoded_event.get("messageType", "undefined"),
+        "subscriptionFilters": decoded_event.get("subscriptionFilters", "undefined"),
     }
 
     # Parse out the service name.

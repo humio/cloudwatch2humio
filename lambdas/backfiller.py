@@ -48,7 +48,7 @@ def lambda_handler(event, context):
     # If we have a next token, recursively fire another instance of backfiller with it.
     # This is to look through all events.
     if 'nextToken' in log_groups.keys():
-        lambda_client = boto3.client("lambda")
+        lambda_client = boto3.client('lambda')
         event['nextToken'] = log_groups['nextToken']
         lambda_client.invoke(
             FunctionName=context.function_name,
@@ -82,7 +82,7 @@ def lambda_handler(event, context):
                 )
             # We are now subscribed.
             else:
-                print("We are already subscribed to %s" % log_group['logGroupName'])
+                print('We are already subscribed to %s' % log_group['logGroupName'])
         # When there are no subscription filters, let us subscribe!
         else:
             helpers.create_subscription(

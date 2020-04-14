@@ -14,7 +14,7 @@ def decode_event(event):
     :return: Unzipped and decoded event.6
     :rtype: JSON
     """
-    decoded_json_event = gzip.decompress(base64.b64decode(event['awslogs']['data']))
+    decoded_json_event = gzip.decompress(base64.b64decode(event["awslogs"]["data"]))
     decoded_event = json.loads(decoded_json_event)
     return decoded_event
 
