@@ -1,0 +1,16 @@
+{
+    "MetricDataQueries": [
+        {
+            "Id": "test_cloudwatch_metrics_lambda_invocations",
+            "MetricStat": {
+                "Metric": {
+                    "Namespace": "AWS/Lambda",
+                    "MetricName": "Invocations" 
+                },
+                "Period": 60,
+                "Stat": "Sum",
+                "Unit": "Count"
+            }
+        }
+    ]
+}

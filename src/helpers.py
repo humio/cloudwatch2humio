@@ -1,7 +1,59 @@
 import gzip
-import json
 import base64
 import re
+import os
+import json
+import requests
+
+
+def setup():
+    """
+    Sets up variables that should persists across Lambda invocations.
+    """
+    global humio_host
+    global humio_protocol
+    global humio_ingest_token
+    global http_session
+    global _is_setup
+
+    humio_host = os.environ["humio_host"]
+    humio_protocol = os.environ["humio_protocol"]
+    humio_ingest_token = os.environ["humio_ingest_token"]
+    http_session = requests.Session()
+    _is_setup = True
+
+
+def ingest_events(humio_events, host_type):
+    """
+    Wrap and send CloudWatch Logs/Metrics to Humio repository.
+
+    :param humio_events: Structured events to be ingested into Humio.
+    :type humio_events: list
+
+    :param host_type: Type of host from which the events are being sent.
+    :type host_type: str
+
+    :return: Response object from request.
+    :rtype: obj
+    """
+    humio_url = "%s://%s/api/v1/ingest/humio-structured" % (humio_protocol, humio_host)
+    humio_headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer %s" % humio_ingest_token
+    }
+
+    # Prepare events to be sent to Humio.
+    wrapped_data = [{"tags": {"host": host_type}, "events": humio_events}]
+
+    print("Data being sent to Humio: %s" % wrapped_data)
+
+    # Make request. 
+    request = http_session.post(
+        humio_url,
+        data=json.dumps(wrapped_data),
+        headers=humio_headers
+    )
+    return request
 
 
 def decode_event(event):
@@ -9,13 +61,14 @@ def decode_event(event):
     Unzip and decode given event.
 
     :param event: CloudWatch Log event.
-    :type event: obj
+    :type event: dict
 
-    :return: Unzipped and decoded event.6
-    :rtype: JSON
+    :return: Unzipped and decoded event.
+    :rtype: dict
     """
-    decoded_json_event = gzip.decompress(base64.b64decode(event['awslogs']['data']))
+    decoded_json_event = gzip.decompress(base64.b64decode(event["awslogs"]["data"]))
     decoded_event = json.loads(decoded_json_event)
+
     return decoded_event
 
 
@@ -24,34 +77,38 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
     Create subscription to CloudWatch Logs specified log group.
 
     :param log_client: Boto client for CloudWatch Logs.
+    :type log_client: obj
 
     :param log_group_name: Name of the log group.
     :type log_group_name: str
 
-    :param humio_log_ingester_arn: Name of the Ingester resource.
+    :param humio_log_ingester_arn: Name of the logs ingester resource.
     :type humio_log_ingester_arn: str
 
     :param context: Lambda context object.
     :type context: obj
 
     :return: None
-    """
+    """   
     # We cannot subscribe to the log group that our stdout/err goes to.
     if context.log_group_name == log_group_name:
         print("Skipping our own log group name...")
+    # And we do not want to subscribe to other Humio log ingesters - if there are any. 
+    if "HumioCloudWatchLogsIngester" in context.log_group_name:
+        print("Skipping cloudwatch2humio ingesters...") 
     else:
         print("Creating subscription for %s" % log_group_name)
-    try:
-        log_client.put_subscription_filter(
-            logGroupName=log_group_name,
-            filterName="%s-humio_ingester" % log_group_name,
-            filterPattern="",  # Matching everything.
-            destinationArn=humio_log_ingester_arn,
-            distribution="ByLogStream"
-        )
-        print("Successfully subscribed to %s!" % log_group_name)
-    except Exception as exception:
-        print("Error creating subscription to %s. Exception: %s" % (log_group_name, exception))
+        try:
+            log_client.put_subscription_filter(
+                logGroupName=log_group_name,
+                filterName="%s-humio_ingester" % log_group_name,
+                filterPattern="",  # Matching everything.
+                destinationArn=humio_log_ingester_arn,
+                distribution="ByLogStream"
+            )
+            print("Successfully subscribed to %s!" % log_group_name)
+        except Exception as exception:
+            print("Error creating subscription to %s. Exception: %s" % (log_group_name, exception))
 
 
 def delete_subscription(log_client, log_group_name, filter_name):
@@ -68,7 +125,7 @@ def delete_subscription(log_client, log_group_name, filter_name):
     :type filter_name: str
 
     :return: None
-    """
+    """    
     print("Deleting subscription for %s" % log_group_name)
     log_client.delete_subscription_filter(
         logGroupName=log_group_name,

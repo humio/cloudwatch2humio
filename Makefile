@@ -7,10 +7,10 @@ target:
 	mkdir -p target
 
 copy:
-	cp lambdas/* target
+	cp src/* target
 
 dependencies:
-	pip3 install requests -t target
+	pip3 install -r requirements.txt -t target
 
 target/cloudwatch_humio.zip:
 	(cd target/ && zip -r ../target/cloudwatch_humio.zip * )

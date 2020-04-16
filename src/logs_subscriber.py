@@ -12,16 +12,15 @@ log_client = boto3.client("logs")
 
 def lambda_handler(event, context):
     """
-    Auto-subscribe to log group from event.
+    Subscribes log ingester to log group from event.
 
     :param event: Event data from CloudWatch Logs.
     :type event: dict
 
-    :param context: Lambda object context.
+    :param context: Lambda context object.
     :type context: obj
 
     :return: None
-    :rtype: NoneType
     """
     # Grab the log group name from incoming event.
     log_group_name = event["detail"]["requestParameters"]["logGroupName"]
