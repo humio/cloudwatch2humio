@@ -1,4 +1,3 @@
-
 build: clean target copy dependencies target/cloudwatch_humio.zip
 
 clean:
