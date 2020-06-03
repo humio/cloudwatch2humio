@@ -4,4 +4,5 @@
 .vscode/
 venv/
 target/
+deploy.sh
 parameters.json
