@@ -1,60 +1,27 @@
 import re
 import json
-import os
-import requests
 import helpers
 
 # False when setup has not been performed.
 _is_setup = False
 
 
-def setup():
-    """
-    Sets up variables that should persists across Lambda invocations.
-
-    :return: None
-    :rtype: NoneType
-    """
-    global humio_host
-    global humio_protocol
-    global humio_repository
-    global humio_ingest_token
-    global http_session
-
-    humio_host = os.environ["humio_host"]
-    humio_protocol = os.environ["humio_protocol"]
-    humio_repository = os.environ["humio_repository_name"]
-    humio_ingest_token = os.environ["humio_ingest_token"]
-
-    http_session = requests.Session()
-
-    global _is_setup
-    _is_setup = True
-
-
 def lambda_handler(event, context):
     """
-    Ingest CloudWatch Logs to Humio repository.
+    Extract log data from CloudWatch Logs events and
+    pass the data onto the Humio ingester.
 
     :param event: Event data from CloudWatch Logs.
     :type event: dict
 
-    :param context: Lambda object context.
+    :param context: Lambda context object.
     :type context: obj
 
     :return: None
-    :rtype: NoneType
     """
-    # TODO: Is there a better way?
+    # Persist variables across lambda invocations.
     if not _is_setup:
-        setup()
-
-    # TODO: Use Python Client.
-    humio_url = "%s://%s/api/v1/dataspaces/%s/ingest" % (humio_protocol, humio_host, humio_repository)
-    humio_headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer %s" % humio_ingest_token
-    }
+        helpers.setup()
 
     # Decode and unzip the log data.
     decoded_event = helpers.decode_event(event)
@@ -100,15 +67,8 @@ def lambda_handler(event, context):
             "attributes": attributes,
         })
 
-    # Make a batch for the Humio Ingest API.
-    wrapped_data = [{"tags": {"host": "lambda"}, "events": humio_events}]
-
-    # Make request.
-    request = http_session.post(
-        humio_url,
-        data=json.dumps(wrapped_data),
-        headers=humio_headers
-    )
+    # Make request to Humio.
+    request = helpers.ingest_events(humio_events, 'cloudwatch_logs')
 
     response = request.text
 

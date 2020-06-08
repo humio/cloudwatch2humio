@@ -1,0 +1,18 @@
+[
+    {
+      "Namespace": "AWS/Lambda",
+      "MetricName": "Invocations",
+      "Period": 60,
+      "Statistics": [
+        "Sum"
+      ]
+    },
+    {
+      "Namespace": "AWS/Lambda",
+      "MetricName": "Errors",
+      "Period": 60,
+      "Statistics": [
+        "Sum"
+      ]
+    }
+]

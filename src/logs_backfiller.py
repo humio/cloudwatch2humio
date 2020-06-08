@@ -19,11 +19,10 @@ def lambda_handler(event, context):
     :param event: Event data from CloudWatch Logs.
     :type event: dict
 
-    :param context: Lambda object context.
+    :param context: Lambda context object.
     :type context: obj
 
     :return: None
-    :rtype: NoneType
     """
     # Grab all log groups with a token and/or prefix if we have them.
     if "nextToken" in event.keys():
@@ -46,10 +45,9 @@ def lambda_handler(event, context):
             log_groups = log_client.describe_log_groups()
 
     # If we have a next token, recursively fire another instance of backfiller with it.
-    # This is to look through all events.
-    if 'nextToken' in log_groups.keys():
+    if "nextToken" in log_groups.keys():
         lambda_client = boto3.client("lambda")
-        event['nextToken'] = log_groups['nextToken']
+        event["nextToken"] = log_groups["nextToken"]
         lambda_client.invoke(
             FunctionName=context.function_name,
             InvocationType="Event",
@@ -80,7 +78,7 @@ def lambda_handler(event, context):
                 )
             # We are now subscribed.
             else:
-                print("We are already subscribed to %s" % log_group['logGroupName'])
+                print("We are already subscribed to %s" % log_group["logGroupName"])
         # When there are no subscription filters, let us subscribe!
         else:
             helpers.create_subscription(
