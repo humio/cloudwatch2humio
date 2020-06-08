@@ -120,8 +120,7 @@ def create_humio_events(metrics, user_defined_data):
                         "id": result["Id"],
                         "label": result["Label"],
                         "value": result["Values"][count],
-                        "status_code": result["StatusCode"],
-                        "messsage": result.get("Messages"[count], "None")
+                        "status_code": result["StatusCode"]
                     },
                     "messages": metrics.get("Messages", "None"),
                     "requestType": "GetMetricData",
