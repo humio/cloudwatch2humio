@@ -23,7 +23,7 @@ def lambda_handler(event, context):
         helpers.setup()
 
     # Load user defined configurations for the API request. 
-    user_defined_data = json.load(open("user_defined_metric_data.json", "r"))
+    user_defined_data = json.load(open("user_defined_metric_statistics_data.json", "r"))
 
     # Make CloudWatch:GetMetricStatistics API request.
     metric_statistics, api_parameters = get_metric_statistics(user_defined_data)

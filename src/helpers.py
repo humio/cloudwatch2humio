@@ -94,7 +94,7 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
     if context.log_group_name == log_group_name:
         print("Skipping our own log group name...")
     # And we do not want to subscribe to other Humio log ingesters - if there are any. 
-    if "HumioCloudWatchLogsIngester" in context.log_group_name:
+    if "HumioCloudWatchLogsIngester" in log_group_name:
         print("Skipping cloudwatch2humio ingesters...") 
     else:
         print("Creating subscription for %s" % log_group_name)
