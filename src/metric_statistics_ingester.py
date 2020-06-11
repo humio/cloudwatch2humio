@@ -23,10 +23,10 @@ def lambda_handler(event, context):
         helpers.setup()
 
     # Load user defined configurations for the API request. 
-    user_defined_data = json.load(open("user_defined_metric_statistics_data.json", "r"))
+    configurations = json.load(open("conf_metric_statistics_ingester.json", "r"))
 
     # Make CloudWatch:GetMetricStatistics API request.
-    metric_statistics, api_parameters = get_metric_statistics(user_defined_data)
+    metric_statistics, api_parameters = get_metric_statistics(configurations)
 
     # Used for debugging.
     print("Statistics from CloudWatch Metrics: %s" % metric_statistics)
@@ -42,13 +42,13 @@ def lambda_handler(event, context):
     print("Got response %s from Humio." % response)
 
 
-def get_metric_statistics(user_defined_data):
+def get_metric_statistics(configurations):
     """
     Make CloudWatch:GetMetricStatistics API request.
 
-    :param user_defined_data: User defined API request parameters for the boto client.
+    :param configurations: User defined API request parameters for the boto client.
     This is a list of one or more API parameters to make one or more calls.
-    :type user_defined_data: list
+    :type configurations: list
 
     :return: Metric statistics retrieved from a request and the corresponding API parameters.
     :rtype: dict, dict
@@ -57,7 +57,7 @@ def get_metric_statistics(user_defined_data):
     metric_client = boto3.client("cloudwatch")
 
     # Make CloudWatch:GetMetricStatistics API request.
-    for api_parameters in user_defined_data:
+    for api_parameters in configurations:
 
         # Check whether start and end time has been set or defaults are to be used.
         if "StartTime" not in api_parameters.keys():
@@ -115,7 +115,7 @@ def create_humio_events(metrics, api_parameters):
                     "responseMetaData": metrics["ResponseMetadata"]
                 },
                 "requestType": "GetMetricStatistics",
-                "userDefinedData ": api_parameters
+                "requestParameters ": api_parameters
             }
         }
         humio_events.append(event)

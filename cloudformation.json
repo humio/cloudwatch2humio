@@ -1,5 +1,6 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description": "CloudWatch to Humio Integration for sending CloudWatch Logs and Metrics to Humio.",
   "Parameters" : {
     "HumioProtocol" : {
       "Type" : "String",
@@ -25,15 +26,6 @@
       ],
       "Default" : "true",
       "Description" : "Enabling this will make the logs ingester automatically subscribe to new log groups specified with the prefix below. Set to 'true' to enable."
-    },
-    "HumioCloudWatchLogsBackfillerSubscription" : {
-      "Type" : "String",
-      "AllowedValues" : [
-        "true",
-        "false"
-      ],
-      "Default" : "true",
-      "Description" : "Enabling this will backfill older log groups that existed before Humio was installed. This will run every time a new log group is created."
     },
     "HumioCloudWatchLogsSubscriptionPrefix" : {
       "Type" : "String",
@@ -152,8 +144,7 @@
             "humio_log_ingester_arn" : {
               "Fn::GetAtt" : [ "HumioCloudWatchLogsIngester", "Arn" ]
             },
-            "humio_subscription_prefix" : { "Ref" : "HumioCloudWatchLogsSubscriptionPrefix" },
-            "humio_subscription_backfiller" : { "Ref" : "HumioCloudWatchLogsBackfillerSubscription" }
+            "humio_subscription_prefix" : { "Ref" : "HumioCloudWatchLogsSubscriptionPrefix" }
           }
         },
         "Description" : "CloudWatch Logs to Humio log group subscriber.",
@@ -241,7 +232,7 @@
       "Properties" : {
         "AccessControl" : "BucketOwnerFullControl",
         "BucketName" : {
-          "Fn::Join" : [ "-", [ "humio", { "Ref" : "AWS::StackName" } , "cloudtrail" ] ]
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio", "cloudtrail" ] ]
         }
       }
     },
@@ -293,10 +284,10 @@
         "IsMultiRegionTrail" : true,
         "IsLogging" : true,
         "S3BucketName" : {
-          "Fn::Join" : [ "-", [ "humio", { "Ref" : "AWS::StackName" }, "cloudtrail" ] ]
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio", "cloudtrail" ] ]
         },
         "TrailName" : {
-          "Fn::Join" : [ "-", [ "humio", { "Ref" : "AWS::AccountId" } ] ]
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio", { "Ref" : "AWS::AccountId" } ] ]
         }
       }
     },
@@ -315,12 +306,12 @@
           }
         },
         "Name" : {
-          "Fn::Join" : [ "", [ "humio-auto-subscription-rule-", { "Ref" : "AWS::StackName" } ] ]
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio-auto-subscription-rule" ] ]
         },
         "Targets" : [
           {
             "Id" : {
-              "Fn::Join" : [ "", [ "humio-auto-subscription-", { "Ref" : "AWS::StackName" } ] ]
+              "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio-auto-subscription-rule" ] ]
             },
             "Arn" : {
               "Fn::GetAtt" : [ "HumioCloudWatchLogsSubscriber", "Arn" ]
