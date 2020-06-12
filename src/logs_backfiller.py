@@ -87,6 +87,3 @@ def lambda_handler(event, context):
                 humio_log_ingester_arn, context
             )
 
-        # Keep hitting rate limits?
-        # TODO: Find actual limits and back off using those.
-        sleep(0.8)

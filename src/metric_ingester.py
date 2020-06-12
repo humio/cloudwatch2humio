@@ -23,30 +23,30 @@ def lambda_handler(event, context):
         helpers.setup()
 
     # Load user defined configurations for the API request. 
-    user_defined_data = json.load(open("user_defined_metric_data.json", "r"))
+    configurations = json.load(open("conf_metric_ingester.json", "r"))
 
     # Set next token if one is present in the event.
     if "NextToken" in event.keys():
-        user_defined_data["NextToken"] = event["NextToken"]
+        configurations["NextToken"] = event["NextToken"]
 
     # Set default start time if none is present.
-    if "StartTime" not in user_defined_data.keys():
+    if "StartTime" not in configurations.keys():
         if "StartTime" in event.keys():
-            user_defined_data["StartTime"] = event["StartTime"]
+            configurations["StartTime"] = event["StartTime"]
         else:
-            user_defined_data["StartTime"] = (datetime.utcnow() - timedelta(minutes=15))\
+            configurations["StartTime"] = (datetime.utcnow() - timedelta(minutes=15))\
                 .replace(tzinfo=timezone.utc).isoformat()  # 15 minutes ago.
     
     # Set default end time if none is present. 
-    if "EndTime" not in user_defined_data.keys():
+    if "EndTime" not in configurations.keys():
         if "EndTime" in event.keys():
-            user_defined_data["EndTime"] = event["EndTime"]
+            configurations["EndTime"] = event["EndTime"]
         else:
-            user_defined_data["EndTime"] = datetime.utcnow()\
+            configurations["EndTime"] = datetime.utcnow()\
                 .replace(tzinfo=timezone.utc).isoformat()  # Now.
             
     # Make CloudWatch:GetMetricData API request.
-    metric_data = get_metric_data(user_defined_data)
+    metric_data = get_metric_data(configurations)
 
     # If there is a next token in the metric data,
     # then use this to retrieve the rest of the metrics recursively.
@@ -54,8 +54,8 @@ def lambda_handler(event, context):
         lambda_client = boto3.client("lambda")
         # Pass on next token, start time, and end time.
         event["NextToken"] = metric_data["NextToken"]
-        event["StartTime"] = user_defined_data["StartTime"]
-        event["EndTime"] = user_defined_data["EndTime"]
+        event["StartTime"] = configurations["StartTime"]
+        event["EndTime"] = configurations["EndTime"]
         lambda_client.invoke(
             FunctionName=context.function_name,
             InvocationType="Event",
@@ -63,7 +63,7 @@ def lambda_handler(event, context):
         )
 
     # Format metric data to Humio event data.
-    humio_events = create_humio_events(metric_data, user_defined_data)
+    humio_events = create_humio_events(metric_data, configurations)
 
     # Send Humio event data to Humio.
     request = helpers.ingest_events(humio_events, "cloudwatch_metrics")
@@ -73,12 +73,12 @@ def lambda_handler(event, context):
     print("Got response %s from Humio." % response)
 
 
-def get_metric_data(user_defined_data):
+def get_metric_data(configurations):
     """
     Make CloudWatch:GetMetricData API request.
 
-    :param user_defined_data: User defined API request parameters for the boto client.
-    :type user_defined_data: list
+    :param configurations: User defined API request parameters for the boto client.
+    :type configurations: list
 
     :return: Metric data retrieved from request.
     :rtype: dict
@@ -88,20 +88,20 @@ def get_metric_data(user_defined_data):
 
     # Make GetMetricData API request.
     metric_data = metric_client.get_metric_data(
-        **user_defined_data
+        **configurations
     )
     return metric_data
 
 
-def create_humio_events(metrics, user_defined_data):
+def create_humio_events(metrics, configurations):
     """
     Create list of Humio events based on metrics.
 
     :param metrics: Metrics received from GetMetricData.
     :type metrics: dict
 
-    :param user_defined_data: User defined API request parameters for the boto client.
-    :type user_defined_data: dict
+    :param configurations: User defined API request parameters for the boto client.
+    :type configurations: dict
 
     :return: Events to be sent to Humio.
     :rtype: list
@@ -124,7 +124,7 @@ def create_humio_events(metrics, user_defined_data):
                     },
                     "messages": metrics.get("Messages", "None"),
                     "requestType": "GetMetricData",
-                    "userDefinedData": user_defined_data
+                    "requestParameters": configurations
                 }
             }
             humio_events.append(event)
