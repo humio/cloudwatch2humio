@@ -10,4 +10,4 @@ aws s3 cp --acl public-read target/cloudwatch_humio.zip s3://humio-public-eu-wes
 aws s3 cp --acl public-read target/cloudwatch_humio.zip s3://humio-public-us-east-1/ --profile cloudwatch --region us-east-1
 aws s3 cp --acl public-read target/cloudwatch_humio.zip s3://humio-public-us-east-2/ --profile cloudwatch --region us-east-2
 aws s3 cp --acl public-read target/cloudwatch_humio.zip s3://humio-public-us-west-2/ --profile cloudwatch --region us-west-2
- 
+aws s3 cp --acl public-read target/cloudwatch_humio.zip s3://humio-public-eu-west-2/ --profile cloudwatch --region eu-west-2
