@@ -7,15 +7,17 @@
       "AllowedValues" : [
         "true",
         "false"
-      ]
+      ],
+      "Description": "Enabling this will allow you to use a VPC for the lambda ingester functions.",
+      "Default": "false"
     },
     "SecurityGroupIds" : {
-      "Type": "List<AWS::EC2::SecurityGroup::Id>",
-      "Description": "A list of security group ids for the VPC configuration of the ingestor lambda functions."
+      "Type": "CommaDelimitedList",
+      "Description": "A list of security group ids for the VPC configuration of the ingester lambda functions."
     },
     "SubnetIds" : {
-      "Type": "List<AWS::EC2::Subnet::Id>",
-      "Description": "A list of subnet ids that the ingestor lamda functions will be deployed into."
+      "Type": "CommaDelimitedList",
+      "Description": "A list of subnet ids that the ingester lamda functions will be deployed into."
     },
     "HumioProtocol" : {
       "Type" : "String",
@@ -81,31 +83,60 @@
           {
             "PolicyName" : "humio_cloudwatch_role",
             "PolicyDocument" : {
-              "Version" : "2012-10-17",
-              "Statement" : [
+              "Fn::If": ["ConfigureIngestLambdaVpcConfig",
                 {
-                  "Effect" : "Allow",
-                  "Action" : [
-                    "lambda:GetFunction",
-                    "lambda:InvokeFunction",
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:DescribeLogGroups",
-                    "logs:DescribeLogStreams",
-                    "logs:DescribeSubscriptionFilters",
-                    "logs:PutSubscriptionFilter",
-                    "logs:DeleteSubscriptionFilter",
-                    "logs:PutLogEvents",
-                    "logs:GetLogEvents",
-                    "logs:FilterLogEvents",
-                    "cloudwatch:GetMetricData",
-                    "cloudwatch:GetMetricStatistics",
-                    "ec2:CreateNetworkInterface",
-                    "ec2:DescribeNetworkInterfaces",
-                    "ec2:CreateNetworkInterfacePermission",
-                    "ec2:DeleteNetworkInterface"
-                  ],
-                  "Resource" : "*"
+                  "Version" : "2012-10-17",
+                  "Statement" : [
+                    {
+                      "Effect" : "Allow",
+                      "Action" : [
+                        "lambda:GetFunction",
+                        "lambda:InvokeFunction",
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams",
+                        "logs:DescribeSubscriptionFilters",
+                        "logs:PutSubscriptionFilter",
+                        "logs:DeleteSubscriptionFilter",
+                        "logs:PutLogEvents",
+                        "logs:GetLogEvents",
+                        "logs:FilterLogEvents",
+                        "cloudwatch:GetMetricData",
+                        "cloudwatch:GetMetricStatistics",
+                        "ec2:CreateNetworkInterface",
+                        "ec2:DescribeNetworkInterfaces",
+                        "ec2:CreateNetworkInterfacePermission",
+                        "ec2:DeleteNetworkInterface"
+                      ],
+                      "Resource" : "*"
+                    }
+                  ]
+                },
+                {
+                  "Version" : "2012-10-17",
+                  "Statement" : [
+                    {
+                      "Effect" : "Allow",
+                      "Action" : [
+                        "lambda:GetFunction",
+                        "lambda:InvokeFunction",
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams",
+                        "logs:DescribeSubscriptionFilters",
+                        "logs:PutSubscriptionFilter",
+                        "logs:DeleteSubscriptionFilter",
+                        "logs:PutLogEvents",
+                        "logs:GetLogEvents",
+                        "logs:FilterLogEvents",
+                        "cloudwatch:GetMetricData",
+                        "cloudwatch:GetMetricStatistics"
+                      ],
+                      "Resource" : "*"
+                    }
+                  ]
                 }
               ]
             }
