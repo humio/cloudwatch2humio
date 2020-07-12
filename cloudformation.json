@@ -2,6 +2,23 @@
   "AWSTemplateFormatVersion" : "2010-09-09",
   "Description": "CloudWatch to Humio Integration for sending CloudWatch Logs and Metrics to Humio.",
   "Parameters" : {
+    "ConfigureIngestLambdaVpcConfig": {
+      "Type": "String",
+      "AllowedValues" : [
+        "true",
+        "false"
+      ],
+      "Description": "Enabling this will allow you to use a VPC for the lambda ingester functions.",
+      "Default": "false"
+    },
+    "SecurityGroupIds" : {
+      "Type": "CommaDelimitedList",
+      "Description": "A list of security group ids for the VPC configuration of the ingester lambda functions."
+    },
+    "SubnetIds" : {
+      "Type": "CommaDelimitedList",
+      "Description": "A list of subnet ids that the ingester lamda functions will be deployed into."
+    },
     "HumioProtocol" : {
       "Type" : "String",
       "Description" : "The transport protocol used for delivering log/metric events to Humio. HTTPS is default and recommended.",
@@ -36,6 +53,9 @@
   "Conditions" : {
     "CreateHumioCloudWatchLogsAutoSubscriptionResources" : {
       "Fn::Equals" : [ { "Ref" : "HumioCloudWatchLogsAutoSubscription" }, "true" ]
+    },
+    "ConfigureIngestLambdaVpcConfig" : {
+      "Fn::Equals" : [ { "Ref" : "ConfigureIngestLambdaVpcConfig" }, "true" ]
     }
   },
   "Resources" : {
@@ -58,32 +78,65 @@
               "Sid" : ""
             }
           ]
-        }, 
+        },
         "Policies" : [
           {
             "PolicyName" : "humio_cloudwatch_role",
             "PolicyDocument" : {
-              "Version" : "2012-10-17",
-              "Statement" : [
+              "Fn::If": ["ConfigureIngestLambdaVpcConfig",
                 {
-                  "Effect" : "Allow",
-                  "Action" : [
-                    "lambda:GetFunction",
-                    "lambda:InvokeFunction",
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:DescribeLogGroups",
-                    "logs:DescribeLogStreams",
-                    "logs:DescribeSubscriptionFilters",
-                    "logs:PutSubscriptionFilter",
-                    "logs:DeleteSubscriptionFilter",
-                    "logs:PutLogEvents",
-                    "logs:GetLogEvents",
-                    "logs:FilterLogEvents",
-                    "cloudwatch:GetMetricData",
-                    "cloudwatch:GetMetricStatistics"
-                  ],
-                  "Resource" : "*"
+                  "Version" : "2012-10-17",
+                  "Statement" : [
+                    {
+                      "Effect" : "Allow",
+                      "Action" : [
+                        "lambda:GetFunction",
+                        "lambda:InvokeFunction",
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams",
+                        "logs:DescribeSubscriptionFilters",
+                        "logs:PutSubscriptionFilter",
+                        "logs:DeleteSubscriptionFilter",
+                        "logs:PutLogEvents",
+                        "logs:GetLogEvents",
+                        "logs:FilterLogEvents",
+                        "cloudwatch:GetMetricData",
+                        "cloudwatch:GetMetricStatistics",
+                        "ec2:CreateNetworkInterface",
+                        "ec2:DescribeNetworkInterfaces",
+                        "ec2:CreateNetworkInterfacePermission",
+                        "ec2:DeleteNetworkInterface"
+                      ],
+                      "Resource" : "*"
+                    }
+                  ]
+                },
+                {
+                  "Version" : "2012-10-17",
+                  "Statement" : [
+                    {
+                      "Effect" : "Allow",
+                      "Action" : [
+                        "lambda:GetFunction",
+                        "lambda:InvokeFunction",
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams",
+                        "logs:DescribeSubscriptionFilters",
+                        "logs:PutSubscriptionFilter",
+                        "logs:DeleteSubscriptionFilter",
+                        "logs:PutLogEvents",
+                        "logs:GetLogEvents",
+                        "logs:FilterLogEvents",
+                        "cloudwatch:GetMetricData",
+                        "cloudwatch:GetMetricStatistics"
+                      ],
+                      "Resource" : "*"
+                    }
+                  ]
                 }
               ]
             }
@@ -96,8 +149,8 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { 
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ] 
+          "S3Bucket" : {
+            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : "cloudwatch_humio.zip"
         },
@@ -108,6 +161,17 @@
             "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
             "humio_subscription_enable" : { "Ref" : "HumioCloudWatchLogsAutoSubscription" }
           }
+        },
+        "VpcConfig": {
+          "Fn::If": ["ConfigureIngestLambdaVpcConfig",
+            {
+              "SecurityGroupIds": { "Ref": "SecurityGroupIds" },
+              "SubnetIds": { "Ref": "SubnetIds" }
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
         },
         "Description" : "CloudWatch Logs to Humio ingester.",
         "Handler" : "logs_ingester.lambda_handler",
@@ -134,8 +198,8 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { 
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ] 
+          "S3Bucket" : {
+            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : "cloudwatch_humio.zip"
         },
@@ -188,8 +252,8 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { 
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ] 
+          "S3Bucket" : {
+            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : "cloudwatch_humio.zip"
         },
@@ -325,8 +389,8 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { 
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ] 
+          "S3Bucket" : {
+            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : "cloudwatch_humio.zip"
         },
@@ -337,6 +401,17 @@
             "humio_host" : { "Ref" : "HumioHost" },
             "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
           }
+        },
+        "VpcConfig": {
+          "Fn::If": ["ConfigureIngestLambdaVpcConfig",
+            {
+              "SecurityGroupIds": { "Ref": "SecurityGroupIds" },
+              "SubnetIds": { "Ref": "SubnetIds" }
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
         },
         "Description" : "CloudWatch metrics to Humio ingester.",
         "Handler" : "metric_ingester.lambda_handler",
@@ -363,18 +438,28 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { 
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ] 
+          "S3Bucket" : {
+            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : "cloudwatch_humio.zip"
         },
-
         "Environment" : {
           "Variables" : {
             "humio_protocol" : { "Ref" : "HumioProtocol" },
             "humio_host" : { "Ref" : "HumioHost" },
             "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
           }
+        },
+        "VpcConfig": {
+          "Fn::If": ["ConfigureIngestLambdaVpcConfig",
+            {
+              "SecurityGroupIds": { "Ref": "SecurityGroupIds" },
+              "SubnetIds": { "Ref": "SubnetIds" }
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
         },
         "Description" : "CloudWatch metrics statistics to Humio ingester.",
         "Handler" : "metric_statistics_ingester.lambda_handler",
