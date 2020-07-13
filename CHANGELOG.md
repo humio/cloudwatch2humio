@@ -1,11 +1,17 @@
-
 # Changelog
 
-## (2020-07-12)
-CloudFormation update to support an AWS VPC.
+## (2020-07-13)
+CloudFormation update to support using an AWS VPC for lambda ingesters and for the backfiller to be able to run automatically.
+
+### Added
+- Support for using a VPC regarding lambda ingesters based on a conditional. 
+- Support for automatically running the backfiller lambda on create using a sns topic based on a conditional.
 
 ### Changed
-- CloudFormation file to support a VPC based on a conditional. 
+- Parameter and resource names in the CloudFormation file.
+
+### Removed
+- Unused environment variables in the CloudFormation file.
 
 ## (2020-06-11)
 Major refactoring of codebase and new feature for retrieving CloudWatch metrics.

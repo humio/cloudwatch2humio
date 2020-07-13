@@ -1,24 +1,7 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
-  "Description": "CloudWatch to Humio Integration for sending CloudWatch Logs and Metrics to Humio.",
+  "Description" : "CloudWatch to Humio Integration for sending CloudWatch Logs and Metrics to Humio.",
   "Parameters" : {
-    "ConfigureIngestLambdaVpcConfig": {
-      "Type": "String",
-      "AllowedValues" : [
-        "true",
-        "false"
-      ],
-      "Description": "Enabling this will allow you to use a VPC for the lambda ingester functions.",
-      "Default": "false"
-    },
-    "SecurityGroupIds" : {
-      "Type": "CommaDelimitedList",
-      "Description": "A list of security group ids for the VPC configuration of the ingester lambda functions."
-    },
-    "SubnetIds" : {
-      "Type": "CommaDelimitedList",
-      "Description": "A list of subnet ids that the ingester lamda functions will be deployed into."
-    },
     "HumioProtocol" : {
       "Type" : "String",
       "Description" : "The transport protocol used for delivering log/metric events to Humio. HTTPS is default and recommended.",
@@ -26,36 +9,69 @@
     },
     "HumioHost" : {
       "Type" : "String",
-      "Description" : "The host to ship Humio logs/metrics to.",
+      "Description" : "The host to ship Humio log/metric events to.",
       "Default" : "cloud.humio.com"
     },
     "HumioIngestToken" : {
       "Type" : "String",
-      "Description" : "The value of the ingest token for the repository to ship logs/metrics to from your Humio account.",
+      "Description" : "The value of the ingest token for the repository to ship log/metric events to from your Humio account.",
       "Default" : "",
       "NoEcho" : true
     },
-    "HumioCloudWatchLogsAutoSubscription" : {
+    "EnableCloudWatchLogsAutoSubscription" : {
       "Type" : "String",
       "AllowedValues" : [
         "true",
         "false"
       ],
-      "Default" : "true",
-      "Description" : "Enabling this will make the logs ingester automatically subscribe to new log groups specified with the prefix below. Set to 'true' to enable."
+      "Description" : "Make the log ingester automatically subscribe to new log groups specified with the logs subscription prefix parameter. Set to 'true' to enable.",
+      "Default" : "true"
     },
     "HumioCloudWatchLogsSubscriptionPrefix" : {
       "Type" : "String",
       "Description" : "Humio will only subscribe to log groups with the prefix specified.",
       "Default" : ""
+    },
+    "EnableCloudWatchLogsBackfillerAutoRun" : {
+      "Type" : "String", 
+      "AllowedValues" : [
+        "true",
+        "false"
+      ],
+      "Description" : "Make the backfiller run automatically when created. Set to 'true' to enable.",
+      "Default" : "false"
+    },
+    "SNSTopicArn" : {
+      "Type" : "String",
+      "Description" : "SNS Topic Arn to be used with the backfiller to make it run automatically when created. Only required if backfiller autorun is enabled."
+    },
+    "EnableVPCForIngesterLambdas" : {
+      "Type" : "String",
+      "AllowedValues" : [
+        "true",
+        "false"
+      ],
+      "Description" : "Use a VPC for the lambda ingester functions. Set to 'true' to enable.",
+      "Default" : "false"
+    },
+    "SecurityGroupIds" : {
+      "Type" : "CommaDelimitedList",
+      "Description" : "A list of security group ids for the VPC configuration for the ingester lambda functions. Only required if VPC is enabled."
+    },
+    "SubnetIds" : {
+      "Type" : "CommaDelimitedList",
+      "Description" : "A list of subnet ids used by the VPC configuration that the ingester lamda functions will be deployed into. Only required if VPC is enabled."
     }
   },
   "Conditions" : {
-    "CreateHumioCloudWatchLogsAutoSubscriptionResources" : {
-      "Fn::Equals" : [ { "Ref" : "HumioCloudWatchLogsAutoSubscription" }, "true" ]
+    "CreateAutoSubscriptionResources" : {
+      "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsAutoSubscription" }, "true" ]
     },
-    "ConfigureIngestLambdaVpcConfig" : {
-      "Fn::Equals" : [ { "Ref" : "ConfigureIngestLambdaVpcConfig" }, "true" ]
+    "SubscribeBackfillerToSNSTopic" : {
+      "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsBackfillerAutoRun" }, "true" ]     
+    },
+    "ConfigureVPCForIngesterLambdas" : {
+      "Fn::Equals" : [ { "Ref" : "EnableVPCForIngesterLambdas" }, "true" ]
     }
   },
   "Resources" : {
@@ -83,7 +99,7 @@
           {
             "PolicyName" : "humio_cloudwatch_role",
             "PolicyDocument" : {
-              "Fn::If": ["ConfigureIngestLambdaVpcConfig",
+              "Fn::If" : [ "ConfigureVPCForIngesterLambdas",
                 {
                   "Version" : "2012-10-17",
                   "Statement" : [
@@ -158,18 +174,17 @@
           "Variables" : {
             "humio_protocol" : { "Ref" : "HumioProtocol" },
             "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
-            "humio_subscription_enable" : { "Ref" : "HumioCloudWatchLogsAutoSubscription" }
+            "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
           }
         },
-        "VpcConfig": {
-          "Fn::If": ["ConfigureIngestLambdaVpcConfig",
+        "VpcConfig" : {
+          "Fn::If" : [ "ConfigureVPCForIngesterLambdas",
             {
-              "SecurityGroupIds": { "Ref": "SecurityGroupIds" },
-              "SubnetIds": { "Ref": "SubnetIds" }
+              "SecurityGroupIds" : { "Ref" : "SecurityGroupIds" },
+              "SubnetIds" : { "Ref" : "SubnetIds" }
             },
             {
-              "Ref": "AWS::NoValue"
+              "Ref" : "AWS::NoValue"
             }
           ]
         },
@@ -222,7 +237,7 @@
       }
     },
     "HumioCloudWatchLogsSubscriberPermission" : {
-      "Condition" : "CreateHumioCloudWatchLogsAutoSubscriptionResources",
+      "Condition" : "CreateAutoSubscriptionResources",
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
@@ -234,7 +249,7 @@
       }
     },
     "HumioCloudWatchLogsSubscriberPermission2" : {
-      "Condition" : "CreateHumioCloudWatchLogsAutoSubscriptionResources",
+      "Condition" : "CreateAutoSubscriptionResources",
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
@@ -257,17 +272,15 @@
           },
           "S3Key" : "cloudwatch_humio.zip"
         },
-
         "Environment" : {
           "Variables" : {
             "humio_log_ingester_arn" : {
               "Fn::GetAtt" : [ "HumioCloudWatchLogsIngester", "Arn" ]
             },
-            "humio_subscription_prefix" : { "Ref": "HumioCloudWatchLogsSubscriptionPrefix" },
+            "humio_subscription_prefix" : { "Ref" : "HumioCloudWatchLogsSubscriptionPrefix" },
             "humio_protocol" : { "Ref" : "HumioProtocol" },
             "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
-            "humio_subscription_enable" : { "Ref" : "HumioCloudWatchLogsAutoSubscription" }
+            "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
           }
         },
         "Description" : "CloudWatch Logs to Humio logs backfiller.",
@@ -290,9 +303,32 @@
         "Principal" : "logs.amazonaws.com"
       }
     },
+    "HumioCloudWatchLogsBackfillerPermission2" : {
+      "Condition" : "SubscribeBackfillerToSNSTopic",
+      "Type" : "AWS::Lambda::Permission",
+      "Properties" : {
+        "Action" : "lambda:InvokeFunction",
+        "FunctionName" : {
+          "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ]
+        },
+        "Principal" : "sns.amazonaws.com"
+      }
+    },
+    "HumioCloudWatchLogsBackfillerSNSSubscription" : {
+      "Condition" : "SubscribeBackfillerToSNSTopic",
+      "DependsOn" : [ "HumioCloudWatchLogsBackfiller" ],
+      "Type" : "AWS::SNS::Subscription",
+      "Properties" : {
+        "Endpoint" : {
+          "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ]
+        },
+        "Protocol" : "lambda",
+        "TopicArn" : { "Ref" : "SNSTopicArn" }
+      } 
+    },
     "HumioCloudWatchLogsSubscriberS3Bucket" : {
+      "Condition" : "CreateAutoSubscriptionResources",
       "Type" : "AWS::S3::Bucket",
-      "Condition" : "CreateHumioCloudWatchLogsAutoSubscriptionResources",
       "Properties" : {
         "AccessControl" : "BucketOwnerFullControl",
         "BucketName" : {
@@ -301,9 +337,9 @@
       }
     },
     "HumioCloudWatchLogsSubscriberS3BucketPolicy" : {
-      "Type" : "AWS::S3::BucketPolicy",
+      "Condition" : "CreateAutoSubscriptionResources",
       "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3Bucket" ],
-      "Condition" : "CreateHumioCloudWatchLogsAutoSubscriptionResources",
+      "Type" : "AWS::S3::BucketPolicy",
       "Properties" : {
         "Bucket" : { "Ref" : "HumioCloudWatchLogsSubscriberS3Bucket" },
         "PolicyDocument" : {
@@ -341,7 +377,7 @@
     "HumioCloudWatchLogsSubscriberCloudTrail" : {
       "Type" : "AWS::CloudTrail::Trail",
       "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3BucketPolicy" ],
-      "Condition" : "CreateHumioCloudWatchLogsAutoSubscriptionResources",
+      "Condition" : "CreateAutoSubscriptionResources",
       "Properties" : {
         "EnableLogFileValidation" : false,
         "IncludeGlobalServiceEvents" : true,
@@ -358,7 +394,7 @@
     "HumioCloudWatchLogsSubscriberEventRule" : {
       "Type" : "AWS::Events::Rule",
       "DependsOn" : [ "HumioCloudWatchLogsSubscriber" ],
-      "Condition" : "CreateHumioCloudWatchLogsAutoSubscriptionResources",
+      "Condition" : "CreateAutoSubscriptionResources",
       "Properties" : {
         "Description" : "Humio log group auto subscription event rule.",
         "EventPattern" : {
@@ -394,7 +430,6 @@
           },
           "S3Key" : "cloudwatch_humio.zip"
         },
-
         "Environment" : {
           "Variables" : {
             "humio_protocol" : { "Ref" : "HumioProtocol" },
@@ -402,14 +437,14 @@
             "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
           }
         },
-        "VpcConfig": {
-          "Fn::If": ["ConfigureIngestLambdaVpcConfig",
+        "VpcConfig" : {
+          "Fn::If" : [ "ConfigureVPCForIngesterLambdas",
             {
-              "SecurityGroupIds": { "Ref": "SecurityGroupIds" },
-              "SubnetIds": { "Ref": "SubnetIds" }
+              "SecurityGroupIds" : { "Ref" : "SecurityGroupIds" },
+              "SubnetIds" : { "Ref" : "SubnetIds" }
             },
             {
-              "Ref": "AWS::NoValue"
+              "Ref" : "AWS::NoValue"
             }
           ]
         },
@@ -450,14 +485,14 @@
             "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
           }
         },
-        "VpcConfig": {
-          "Fn::If": ["ConfigureIngestLambdaVpcConfig",
+        "VpcConfig" : {
+          "Fn::If" : [ "ConfigureVPCForIngesterLambdas",
             {
-              "SecurityGroupIds": { "Ref": "SecurityGroupIds" },
-              "SubnetIds": { "Ref": "SubnetIds" }
+              "SecurityGroupIds" : { "Ref" : "SecurityGroupIds" },
+              "SubnetIds" : { "Ref" : "SubnetIds" }
             },
             {
-              "Ref": "AWS::NoValue"
+              "Ref" : "AWS::NoValue"
             }
           ]
         },
