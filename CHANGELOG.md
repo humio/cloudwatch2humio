@@ -1,6 +1,12 @@
 
 # Changelog
 
+## (2020-07-12)
+CloudFormation update to support an AWS VPC.
+
+### Changed
+- CloudFormation file to support a VPC based on a conditional. 
+
 ## (2020-06-11)
 Major refactoring of codebase and new feature for retrieving CloudWatch metrics.
 
