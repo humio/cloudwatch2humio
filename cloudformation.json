@@ -14,7 +14,7 @@
     },
     "HumioIngestToken" : {
       "Type" : "String",
-      "Description" : "The value of the ingest token for the repository to ship log/metric events to from your Humio account.",
+      "Description" : "The value of the ingest token for the repository from your Humio account to ship log/metric events to.",
       "Default" : "",
       "NoEcho" : true
     },
@@ -56,11 +56,11 @@
     },
     "SecurityGroupIds" : {
       "Type" : "CommaDelimitedList",
-      "Description" : "A list of security group ids for the VPC configuration for the ingester lambda functions. Only required if VPC is enabled."
+      "Description" : "A comma separated list of security group ids for the VPC configuration regarding the ingester lambda functions. Only required if VPC is enabled."
     },
     "SubnetIds" : {
       "Type" : "CommaDelimitedList",
-      "Description" : "A list of subnet ids used by the VPC configuration that the ingester lamda functions will be deployed into. Only required if VPC is enabled."
+      "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lamda functions will be deployed into. Only required if VPC is enabled."
     }
   },
   "Conditions" : {
@@ -375,9 +375,9 @@
       }
     },
     "HumioCloudWatchLogsSubscriberCloudTrail" : {
-      "Type" : "AWS::CloudTrail::Trail",
-      "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3BucketPolicy" ],
       "Condition" : "CreateAutoSubscriptionResources",
+      "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3BucketPolicy" ],
+      "Type" : "AWS::CloudTrail::Trail",
       "Properties" : {
         "EnableLogFileValidation" : false,
         "IncludeGlobalServiceEvents" : true,
@@ -392,9 +392,9 @@
       }
     },
     "HumioCloudWatchLogsSubscriberEventRule" : {
-      "Type" : "AWS::Events::Rule",
-      "DependsOn" : [ "HumioCloudWatchLogsSubscriber" ],
       "Condition" : "CreateAutoSubscriptionResources",
+      "DependsOn" : [ "HumioCloudWatchLogsSubscriber" ],
+      "Type" : "AWS::Events::Rule",
       "Properties" : {
         "Description" : "Humio log group auto subscription event rule.",
         "EventPattern" : {

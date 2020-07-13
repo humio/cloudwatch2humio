@@ -1,7 +1,7 @@
 # Changelog
 
 ## (2020-07-13)
-CloudFormation update to support using an AWS VPC for lambda ingesters and for the backfiller to be able to run automatically.
+CloudFormation updated to support using an AWS VPC for lambda ingesters and for the backfiller to be able to be run automatically when created.
 
 ### Added
 - Support for using a VPC regarding lambda ingesters based on a conditional. 
