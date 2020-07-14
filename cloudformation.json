@@ -75,6 +75,13 @@
     }
   },
   "Resources" : {
+    "HumioBackfillerCaller" : {
+      "DependsOn" : [ "HumioCloudWatchLogsBackfiller" ],
+      "Type" : "Custom::BackfillerCaller",
+      "Properties" : {
+        "ServiceToken" : { "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ] }
+      }
+    },
     "HumioCloudWatchRole" : {
       "Type" : "AWS::IAM::Role",
       "Properties" : {

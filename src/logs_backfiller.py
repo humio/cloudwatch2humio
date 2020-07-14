@@ -24,6 +24,18 @@ def lambda_handler(event, context):
 
     :return: None
     """
+    print("Event: %s" % event)
+    if "LogicalResourceId" in event.keys():
+        if event["LogicalResourceId"] == "HumioBackfillerCaller":
+            response = {
+                "Status" : "Success",
+                "RequestId" : event["RequestId"],
+                "LogicalResourceId" : event["LogicalResourceId"],
+                "StackId" : event["StackId"],
+                "PhysicalResourceId" : "HumioCloudWatchLogsBackfiller-Response"
+            }
+            return response
+
     # Grab all log groups with a token and/or prefix if we have them.
     if "nextToken" in event.keys():
         next_token = event["nextToken"]
