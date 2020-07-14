@@ -39,7 +39,7 @@
         "false"
       ],
       "Description" : "Make the backfiller run automatically when created. Set to 'true' to enable.",
-      "Default" : "false"
+      "Default" : "true"
     },
     "EnableVPCForIngesterLambdas" : {
       "Type" : "String",
@@ -71,15 +71,6 @@
     }
   },
   "Resources" : {
-    "HumioBackfillerAutoRunner" : {
-      "Condition" : "CreateHumioBackfillerAutoRunner",
-      "DependsOn" : [ "HumioCloudWatchLogsBackfiller" ],
-      "Type" : "Custom::BackfillerAutoRunner",
-      "Properties" : {
-        "ServiceToken" : { "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ] },
-        "StackName" : { "Ref" : "AWS::StackName" }
-      }
-    },
     "HumioCloudWatchRole" : {
       "Type" : "AWS::IAM::Role",
       "Properties" : {
@@ -272,7 +263,9 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : "humio-cloudformation-test",
+          "S3Bucket" : {
+            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
+          },
           "S3Key" : "cloudwatch_humio.zip"
         },
         "Environment" : {
@@ -304,6 +297,15 @@
           "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ]
         },
         "Principal" : "logs.amazonaws.com"
+      }
+    },
+    "HumioBackfillerAutoRunner" : {
+      "Condition" : "CreateHumioBackfillerAutoRunner",
+      "DependsOn" : [ "HumioCloudWatchLogsBackfiller" ],
+      "Type" : "Custom::BackfillerAutoRunner",
+      "Properties" : {
+        "ServiceToken" : { "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ] },
+        "StackName" : { "Ref" : "AWS::StackName" }
       }
     },
     "HumioCloudWatchLogsSubscriberS3Bucket" : {
