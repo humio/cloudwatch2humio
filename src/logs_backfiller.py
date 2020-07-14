@@ -2,7 +2,7 @@ import boto3
 import json
 import os
 import helpers
-from time import sleep
+import requests
 
 # Set environment variables.
 humio_log_ingester_arn = os.environ["humio_log_ingester_arn"]
@@ -87,3 +87,23 @@ def lambda_handler(event, context):
                 humio_log_ingester_arn, context
             )
 
+    # Create a reponse to the custom resource from the CF to make it finish.
+    # This is used when starting the backfiller automatically.
+    send_custom_resource_response(event, context)
+
+
+def send_custom_resource_response(event, context):
+    if "LogicalResourceId" in event.keys():
+        if event["LogicalResourceId"] == "HumioBackfillerAutoRunner":
+            response_content = {
+                "Status" : "SUCCESS",
+                "RequestId" : event["RequestId"],
+                "LogicalResourceId" : event["LogicalResourceId"],
+                "StackId" : event["StackId"],
+                "PhysicalResourceId" : event["ResourceProperties"]["StackName"] + "-HumioBackfillerAutoRunner"
+            }
+            response = requests.put(
+                event["ResponseURL"],
+                data=json.dumps(response_content)
+            )
+            return response.status_code

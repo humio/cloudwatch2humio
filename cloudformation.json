@@ -41,10 +41,6 @@
       "Description" : "Make the backfiller run automatically when created. Set to 'true' to enable.",
       "Default" : "false"
     },
-    "SNSTopicArn" : {
-      "Type" : "String",
-      "Description" : "SNS Topic Arn to be used with the backfiller to make it run automatically when created. Only required if backfiller autorun is enabled."
-    },
     "EnableVPCForIngesterLambdas" : {
       "Type" : "String",
       "AllowedValues" : [
@@ -67,7 +63,7 @@
     "CreateAutoSubscriptionResources" : {
       "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsAutoSubscription" }, "true" ]
     },
-    "SubscribeBackfillerToSNSTopic" : {
+    "CreateHumioBackfillerAutoRunner" : {
       "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsBackfillerAutoRun" }, "true" ]     
     },
     "ConfigureVPCForIngesterLambdas" : {
@@ -75,6 +71,15 @@
     }
   },
   "Resources" : {
+    "HumioBackfillerAutoRunner" : {
+      "Condition" : "CreateHumioBackfillerAutoRunner",
+      "DependsOn" : [ "HumioCloudWatchLogsBackfiller" ],
+      "Type" : "Custom::BackfillerAutoRunner",
+      "Properties" : {
+        "ServiceToken" : { "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ] },
+        "StackName" : { "Ref" : "AWS::StackName" }
+      }
+    },
     "HumioCloudWatchRole" : {
       "Type" : "AWS::IAM::Role",
       "Properties" : {
@@ -267,9 +272,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : "humio-cloudformation-test",
           "S3Key" : "cloudwatch_humio.zip"
         },
         "Environment" : {
@@ -302,29 +305,6 @@
         },
         "Principal" : "logs.amazonaws.com"
       }
-    },
-    "HumioCloudWatchLogsBackfillerPermission2" : {
-      "Condition" : "SubscribeBackfillerToSNSTopic",
-      "Type" : "AWS::Lambda::Permission",
-      "Properties" : {
-        "Action" : "lambda:InvokeFunction",
-        "FunctionName" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ]
-        },
-        "Principal" : "sns.amazonaws.com"
-      }
-    },
-    "HumioCloudWatchLogsBackfillerSNSSubscription" : {
-      "Condition" : "SubscribeBackfillerToSNSTopic",
-      "DependsOn" : [ "HumioCloudWatchLogsBackfiller" ],
-      "Type" : "AWS::SNS::Subscription",
-      "Properties" : {
-        "Endpoint" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ]
-        },
-        "Protocol" : "lambda",
-        "TopicArn" : { "Ref" : "SNSTopicArn" }
-      } 
     },
     "HumioCloudWatchLogsSubscriberS3Bucket" : {
       "Condition" : "CreateAutoSubscriptionResources",
