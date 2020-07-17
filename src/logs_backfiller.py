@@ -4,13 +4,6 @@ import os
 import helpers
 import requests
 
-# Set environment variables.
-humio_log_ingester_arn = os.environ["humio_log_ingester_arn"]
-humio_subscription_prefix = os.environ.get("humio_subscription_prefix")
-
-# Set up CloudWatch Logs client.
-log_client = boto3.client("logs")
-
 
 def lambda_handler(event, context):
     """
@@ -24,6 +17,17 @@ def lambda_handler(event, context):
 
     :return: None
     """
+    # Create a reponse to the custom resource from the CF to make it finish.
+    # This is used when starting the backfiller automatically.
+    send_custom_resource_response(event, context)
+
+    # Set environment variables.
+    humio_log_ingester_arn = os.environ["humio_log_ingester_arn"]
+    humio_subscription_prefix = os.environ.get("humio_subscription_prefix")
+
+    # Set up CloudWatch Logs client.
+    log_client = boto3.client("logs")
+
     # Grab all log groups with a token and/or prefix if we have them.
     if "nextToken" in event.keys():
         next_token = event["nextToken"]
@@ -87,10 +91,6 @@ def lambda_handler(event, context):
                 humio_log_ingester_arn, context
             )
 
-    # Create a reponse to the custom resource from the CF to make it finish.
-    # This is used when starting the backfiller automatically.
-    send_custom_resource_response(event, context)
-
 
 def send_custom_resource_response(event, context):
     if "LogicalResourceId" in event.keys():
@@ -106,4 +106,5 @@ def send_custom_resource_response(event, context):
                 event["ResponseURL"],
                 data=json.dumps(response_content)
             )
-            return response.status_code
+            # Used for debugging. 
+            print("Response status from Custom Resource: %s " % response.status_code)
