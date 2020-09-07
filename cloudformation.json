@@ -57,6 +57,11 @@
     "SubnetIds" : {
       "Type" : "CommaDelimitedList",
       "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lamda functions will be deployed into. Only required if VPC is enabled."
+    },
+    "S3KeyNameForZipWithLambdas" : {
+      "Type" : "String",
+      "Description" : "The name of the ZIP file in where to find the integration's lambda files.",
+      "Default" : "v1.0.0-cloudwatch2humio"
     }
   },
   "Conditions" : {
@@ -164,7 +169,7 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
         },
         "Environment" : {
           "Variables" : {
@@ -212,7 +217,7 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
         },
         "Environment" : {
           "Variables" : {
@@ -266,7 +271,7 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
         },
         "Environment" : {
           "Variables" : {
@@ -410,7 +415,7 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
         },
         "Environment" : {
           "Variables" : {
@@ -458,7 +463,7 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
         },
         "Environment" : {
           "Variables" : {
