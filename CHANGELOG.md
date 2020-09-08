@@ -5,6 +5,7 @@ Versioning added for a more seamless update-the-integration flow.
 
 ### Added
 - Support for updating an integration to its newest version.
+- Bump2version configuration file for maintaining the integration version.
 - Version parameter in the CloudFormation file.
 - Section for how to release a new version for maintainers. 
 
