@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.0 (2020-09-08)
+Versioning added for a more seamless update-the-integration flow.
+
+### Added
+- Support for updating an integration to its newest version.
+- Version parameter in the CloudFormation file.
+- Section for how to release a new version for maintainers. 
+
+### Changed
+- Guide for setting up the integration for local development.
+- Name of the generated ZIP file containing the lambdas. 
+
 ## (2020-07-13)
 CloudFormation updated to support using an AWS VPC for lambda ingesters and for the backfiller to be able to be run automatically when created.
 

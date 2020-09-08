@@ -443,7 +443,7 @@
             }
           ]
         },
-        "Description" : "CloudWatch metrics to Humio ingester.",
+        "Description" : "CloudWatch Metrics to Humio ingester.",
         "Handler" : "metric_ingester.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
@@ -493,7 +493,7 @@
             }
           ]
         },
-        "Description" : "CloudWatch metrics statistics to Humio ingester.",
+        "Description" : "CloudWatch Metrics Statistics to Humio ingester.",
         "Handler" : "metric_statistics_ingester.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
