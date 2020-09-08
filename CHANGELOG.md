@@ -1,13 +1,13 @@
 # Changelog
 
 ## 1.0.0 (2020-09-08)
-Versioning added for a more seamless update-the-integration flow.
+Versioning added for a more seamless flow for updating the integration..
 
 ### Added
 - Support for updating an integration to its newest version.
 - Bump2version configuration file for maintaining the integration version.
 - Version parameter in the CloudFormation file.
-- Section for how to release a new version for maintainers. 
+- Section describing how to release a new version for maintainers. 
 
 ### Changed
 - Guide for setting up the integration for local development.

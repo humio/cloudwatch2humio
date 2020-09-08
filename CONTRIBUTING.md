@@ -81,7 +81,7 @@ Following is described how to set up the integration for local development.
         },
         {
             "ParameterKey": "Version",
-            "ParameterValue": "v0.0.0"
+            "ParameterValue": "YOUR-VERSION-HERE"
         }
     ]
     ```
@@ -138,8 +138,8 @@ To update the version, follow these steps:
     * To create a minor run: `bump2version minor`
     * To create a major run: `bump2version major`
 
-4. Push your changes.
-5. Run the `deploy.sh` script - access rights required. 
+4. Run `git push --follow-tags` to push changes and initialize the release process.
+5. Run the `deploy.sh` script to upload the CloudFormation file to a S3 bucket as well as the zip file to each supported region's S3 bucket. 
 
 Terms of Service For Contributors
 =================================
