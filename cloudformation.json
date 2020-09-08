@@ -57,6 +57,11 @@
     "SubnetIds" : {
       "Type" : "CommaDelimitedList",
       "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lamda functions will be deployed into. Only required if VPC is enabled."
+    },
+    "Version" : {
+      "Type" : "String",
+      "Description" : "The version of the integration you want installed.",
+      "Default" : "v1.0.0"
     }
   },
   "Conditions" : {
@@ -164,7 +169,9 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : {
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
@@ -212,7 +219,9 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : {
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
@@ -266,7 +275,9 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : {
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
@@ -410,7 +421,9 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : {
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
@@ -430,7 +443,7 @@
             }
           ]
         },
-        "Description" : "CloudWatch metrics to Humio ingester.",
+        "Description" : "CloudWatch Metrics to Humio ingester.",
         "Handler" : "metric_ingester.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
@@ -458,7 +471,9 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : "cloudwatch_humio.zip"
+          "S3Key" : {
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
@@ -478,7 +493,7 @@
             }
           ]
         },
-        "Description" : "CloudWatch metrics statistics to Humio ingester.",
+        "Description" : "CloudWatch Metrics Statistics to Humio ingester.",
         "Handler" : "metric_statistics_ingester.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
