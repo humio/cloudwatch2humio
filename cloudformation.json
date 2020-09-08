@@ -170,7 +170,7 @@
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
-            "Fn:Join" : [ "-", [ { "Ref" : "S3KeyNameForZipWithLambdas" }, "_cloudwatch2humio.zip" ] ]
+            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
         },
         "Environment" : {
           "Variables" : {
@@ -218,7 +218,8 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
+          "S3Key" : {
+            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
         },
         "Environment" : {
           "Variables" : {
@@ -272,7 +273,8 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
+          "S3Key" : {
+            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
         },
         "Environment" : {
           "Variables" : {
@@ -416,7 +418,8 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
+          "S3Key" : {
+            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
         },
         "Environment" : {
           "Variables" : {
@@ -464,7 +467,8 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
+          "S3Key" : {
+            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
         },
         "Environment" : {
           "Variables" : {
