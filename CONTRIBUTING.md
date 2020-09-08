@@ -140,10 +140,10 @@ To update the version, follow these steps:
 2. Locally, check out the `master` branch and pull from `origin/mater`.
 3. Use __ to bump the project version.
 
-    * To craete a patch run: ``
-    * To create a minor run: ``
-    * To create a major run: ``
-    
+    * To craete a patch run: `bump2version patch`
+    * To create a minor run: `bump2version minor`
+    * To create a major run: `bump2version major`
+
 4. Run `` to push changes.
 5. Run the `deploy.sh` script. 
 
