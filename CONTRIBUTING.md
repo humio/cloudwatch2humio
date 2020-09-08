@@ -43,20 +43,20 @@ Following is described how to set up the integration for local development.
             pip3 install -r requirements.txt -t target
             ```
 
-      3. In the *target* folder, zip all files into *cloudwatch_humio.zip*. 
+      3. In the *target* folder, zip all files into *YOUR-ZIP-NAME.zip*. 
 
 3. Create an AWS S3 bucket using the following command: 
 
     ```
-    aws s3api create-bucket --bucket humio-public-YOUR-REGION --create-bucket-configuration LocationConstraint=YOUR-REGION
+    aws s3api create-bucket --bucket YOUR-HUMIO-BUCKET --create-bucket-configuration LocationConstraint=YOUR-REGION
     ```
 
-    - The name of the AWS S3 bucket must be the same as the one specified in the CloudFormation file, beware of this if you choose another name.
+    - The name of the AWS S3 bucket must be the same as the one specified in the CloudFormation file.
 
 4. Upload the zip file to the AWS S3 bucket: 
 
     ```
-    aws s3 cp target/cloudwatch_humio.zip s3://humio-public-YOUR-REGION/
+    aws s3 cp target/YOUR-ZIP-NAME.zip s3://YOUR-HUMIO-BUCKET/
     ``` 
 
 5. Create a *parameters.json* file in the project root folder, and specify the CloudFormation parameters, for example: 
@@ -82,11 +82,16 @@ Following is described how to set up the integration for local development.
         { 
             "ParameterKey": "HumioCloudWatchLogsSubscriptionPrefix", 
             "ParameterValue": "humio" 
+        },
+        {
+            "ParameterKey": "S3KeyNameForZipWithLambdas",
+            "ParameterValue": "YOUR-ZIP-NAME.zip"
         }
     ]
     ```
 
     - Only the  `HumioIngestToken` parameter is required to be specified in the *parameters.json* file as the rest have default values.
+    - The `S3KeyNameForZipWithLambdas` is important though, as this is were CloudFormation will look for the lambda files. Its default value should be that of the latest integration version, for example, *v1.0.0_cloudwatch2humio.zip*.
 
 6. Create the stack using the CloudFormation file and the parameters that you have defined: 
 
@@ -98,29 +103,49 @@ Following is described how to set up the integration for local development.
 
 7. Upating the stack.
 
-    - Depending on your changes, you will either have to delete the stack and create it again using the CloudFormation file, or you can update the stack. 
-
-        - Update the stack:
+    - To update the stack, use the following command: 
     
-            ```
-            aws cloudformation update-stack --stack-name YOUR-DESIRED-STACK-NAME --template-body file://cloudformation.json --parameters file://parameters.json --capabilities CAPABILITY_IAM --region YOUR-REGION
-            ```
+        ```
+        aws cloudformation update-stack --stack-name YOUR-DESIRED-STACK-NAME --template-body file://cloudformation.json --parameters file://parameters.json --capabilities CAPABILITY_IAM --region YOUR-REGION
+        ```
 
-        - Delete the stack:
-    
-            ```
-            aws cloudformation delete-stack --stack-name YOUR-DESIRED-STACK-NAME
-            ```
+    - Note: The stack will only register changes in the CloudFormation file or in the parameters' file. If you have updated the lambda files, you need to change the name of the zip file, and thus the parameter `S3KeyNameForZipWithLambdas` for your changes to be recognized.
+
+8. Deleting the stack.
+
+    - To delete the stack, use the following command:
+
+        ```
+        aws cloudformation delete-stack --stack-name YOUR-DESIRED-STACK-NAME
+        ```
 
 ## Making a Pull Request
 When you have made your changes locally, or you want feedback on a work in progress, you're almost ready to make a pull request. Before doing so however, please go through the following checklist:
 
 1. Test the integration and make sure that all features are still functional.
-3. Add yourself to ``AUTHORS.md``.
+2. Update the version number of the ZIP file in the `Makefile` and of the default value of the `S3KeyNameForZipWithLambdas` parameter in the `cloudformation.json` file. These should always match.
+3. Update the `CHANGELOG.md`.
+3. Add yourself to `AUTHORS.md`.
 
 When you've been through the checklist, push your final changes to your development branch on GitHub.
 
 Congratulations! Your branch is now ready to be included submitted as a pull requests. Got to [cloudwatch2humio](https://github.com/humio/cloudwatch2humio) and use the pull request feature to submit your contribution for review.
+
+## For Maintainers: How to Release
+When a new release of the integration needs to be uploaded to the S3 buckets hosting the lambda files, the version of the integration needs to be updated.
+
+To update the version, follow these steps:
+
+1. Make sure `CHANGELOG.md` has an entry for the new release version.
+2. Locally, check out the `master` branch and pull from `origin/mater`.
+3. Use __ to bump the project version.
+
+    * To craete a patch run: ``
+    * To create a minor run: ``
+    * To create a major run: ``
+    
+4. Run `` to push changes.
+5. Run the `deploy.sh` script. 
 
 Terms of Service For Contributors
 =================================
