@@ -58,10 +58,10 @@
       "Type" : "CommaDelimitedList",
       "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lamda functions will be deployed into. Only required if VPC is enabled."
     },
-    "S3KeyNameForZipWithLambdas" : {
+    "Version" : {
       "Type" : "String",
-      "Description" : "The name of the ZIP file in where to find the integration's lambda files.",
-      "Default" : "v0.2.0-cloudwatch2humio"
+      "Description" : "The version of the integration you want installed.",
+      "Default" : "v0.0.0"
     }
   },
   "Conditions" : {
@@ -169,7 +169,8 @@
           "S3Bucket" : {
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
-          "S3Key" : { "Ref" : "S3KeyNameForZipWithLambdas" }
+          "S3Key" : {
+            "Fn:Join" : [ "-", [ { "Ref" : "S3KeyNameForZipWithLambdas" }, "_cloudwatch2humio.zip" ] ]
         },
         "Environment" : {
           "Variables" : {
