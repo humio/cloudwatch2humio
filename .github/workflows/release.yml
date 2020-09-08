@@ -9,13 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set env
+      - name: "Set ENV"
         run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
       - name: "Install Dependencies"
         run: sudo apt-get install zip
-      - name: "Create zip"
+      - name: "Create ZIP"
         run: make build
-      - name: "Create release"
+      - name: Create Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
