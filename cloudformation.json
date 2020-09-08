@@ -170,7 +170,8 @@
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
-            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
@@ -219,7 +220,8 @@
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
-            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
@@ -274,7 +276,8 @@
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
-            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
@@ -419,7 +422,8 @@
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
-            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
@@ -468,7 +472,8 @@
             "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
-            "Fn:Join" : [ "-", [ { "Ref" : "Version" }, "_cloudwatch2humio.zip" ] ]
+            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
+          }
         },
         "Environment" : {
           "Variables" : {
