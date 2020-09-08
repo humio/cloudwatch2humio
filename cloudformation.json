@@ -61,7 +61,7 @@
     "S3KeyNameForZipWithLambdas" : {
       "Type" : "String",
       "Description" : "The name of the ZIP file in where to find the integration's lambda files.",
-      "Default" : "v0.0.0-cloudwatch2humio"
+      "Default" : "v0.1.0-cloudwatch2humio"
     }
   },
   "Conditions" : {
