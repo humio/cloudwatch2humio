@@ -1,0 +1,22 @@
+name: "Release New Version"
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set env
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
+      - name: Create release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/${{ env.RELEASE_VERSION }}_cloudwatch2humio.zip
+          asset_name: ${{ env.RELEASE_VERSION }}_cloudwatch2humio.zip
+          tag: ${{ env.RELEASE_VERSION }}
+          overwrite: true
+          body: "Automatic release. See changelog for updates"
