@@ -18,6 +18,11 @@
       "Default" : "",
       "NoEcho" : true
     },
+    "HumioLambdaLogRetention" : {
+      "Type" : "Number",
+      "Description" : "Number of days to retain CloudWatch logs from the Humio Lambda functions.",
+      "Default": 1
+    },
     "EnableCloudWatchLogsAutoSubscription" : {
       "Type" : "String",
       "AllowedValues" : [
@@ -211,6 +216,16 @@
         "Principal" : "logs.amazonaws.com"
       }
     },
+    "HumioCloudWatchLogsIngesterLogGroup" : {
+      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "Type" : "AWS::Logs::LogGroup",
+      "Properties" : {
+        "LogGroupName" : {
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchLogsIngester" } ] ]
+        },
+        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+      }
+    },
     "HumioCloudWatchLogsSubscriber" : {
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type" : "AWS::Lambda::Function",
@@ -267,6 +282,16 @@
         }
       }
     },
+    "HumioCloudWatchLogsSubscriberLogGroup" : {
+      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "Type" : "AWS::Logs::LogGroup",
+      "Properties" : {
+        "LogGroupName" : {
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchLogsSubscriber" } ] ]
+        },
+        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+      }
+    },
     "HumioCloudWatchLogsBackfiller" : {
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type" : "AWS::Lambda::Function",
@@ -308,6 +333,16 @@
           "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ]
         },
         "Principal" : "logs.amazonaws.com"
+      }
+    },
+    "HumioCloudWatchLogsBackfillerLogGroup" : {
+      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "Type" : "AWS::Logs::LogGroup",
+      "Properties" : {
+        "LogGroupName" : {
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchLogsBackfiller" } ] ]
+        },
+        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
       }
     },
     "HumioBackfillerAutoRunner" : {
@@ -463,6 +498,16 @@
         "Principal" : "logs.amazonaws.com"
       }
     },
+    "HumioCloudWatchMetricIngesterLogGroup" : {
+      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "Type" : "AWS::Logs::LogGroup",
+      "Properties" : {
+        "LogGroupName" : {
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchMetricIngester" } ] ]
+        },
+        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+      }
+    },
     "HumioCloudWatchMetricStatisticsIngester" : {
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type" : "AWS::Lambda::Function",
@@ -511,6 +556,16 @@
           "Fn::GetAtt" : [ "HumioCloudWatchMetricStatisticsIngester", "Arn" ]
         },
         "Principal" : "logs.amazonaws.com"
+      }
+    },
+    "HumioCloudWatchMetricStatisticsIngesterLogGroup" : {
+      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "Type" : "AWS::Logs::LogGroup",
+      "Properties" : {
+        "LogGroupName" : {
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchMetricStatisticsIngester" } ] ]
+        },
+        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
       }
     }
   }
