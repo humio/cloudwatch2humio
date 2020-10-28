@@ -58,6 +58,11 @@
       "Type" : "CommaDelimitedList",
       "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lamda functions will be deployed into. Only required if VPC is enabled."
     },
+    "HumioLambdaLogLevel" : {
+      "Type" : "String",
+      "AllowedValues" : ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+      "Default" : "INFO"
+    },
     "Version" : {
       "Type" : "String",
       "Description" : "The version of the integration you want installed.",
@@ -177,7 +182,8 @@
           "Variables" : {
             "humio_protocol" : { "Ref" : "HumioProtocol" },
             "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
+            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
+            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
           }
         },
         "VpcConfig" : {
@@ -228,7 +234,8 @@
             "humio_log_ingester_arn" : {
               "Fn::GetAtt" : [ "HumioCloudWatchLogsIngester", "Arn" ]
             },
-            "humio_subscription_prefix" : { "Ref" : "HumioCloudWatchLogsSubscriptionPrefix" }
+            "humio_subscription_prefix" : { "Ref" : "HumioCloudWatchLogsSubscriptionPrefix" },
+            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
           }
         },
         "Description" : "CloudWatch Logs to Humio log group subscriber.",
@@ -287,7 +294,8 @@
             "humio_subscription_prefix" : { "Ref" : "HumioCloudWatchLogsSubscriptionPrefix" },
             "humio_protocol" : { "Ref" : "HumioProtocol" },
             "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
+            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
+            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
           }
         },
         "Description" : "CloudWatch Logs to Humio logs backfiller.",
@@ -429,7 +437,8 @@
           "Variables" : {
             "humio_protocol" : { "Ref" : "HumioProtocol" },
             "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
+            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
+            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
           }
         },
         "VpcConfig" : {
@@ -479,7 +488,8 @@
           "Variables" : {
             "humio_protocol" : { "Ref" : "HumioProtocol" },
             "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" }
+            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
+            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
           }
         },
         "VpcConfig" : {

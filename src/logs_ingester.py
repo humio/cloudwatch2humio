@@ -1,10 +1,15 @@
 import re
 import json
 import helpers
+import os
+import logging
+
+level = os.getenv("log_level", "INFO")
+logger = logging.getLogger()
+logging.basicConfig(level=level)
 
 # False when setup has not been performed.
 _is_setup = False
-
 
 def lambda_handler(event, context):
     """
@@ -27,7 +32,7 @@ def lambda_handler(event, context):
     decoded_event = helpers.decode_event(event)
 
     # Debug output.
-    print("Event from CloudWatch Logs: %s" % (json.dumps(decoded_event)))
+    logger.debug("Event from CloudWatch Logs: %s" % (json.dumps(decoded_event)))
 
     # Extract the general attributes from the event batch.
     batch_attrs = {
@@ -73,4 +78,4 @@ def lambda_handler(event, context):
     response = request.text
 
     # Debug output.
-    print("Got response %s from Humio." % response)
+    logger.debug("Got response %s from Humio." % response)

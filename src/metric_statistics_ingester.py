@@ -2,6 +2,12 @@ import boto3
 import json
 import helpers
 from datetime import datetime, timedelta, timezone
+import os
+import logging
+
+level = os.getenv("log_level", "INFO")
+logger = logging.getLogger()
+logging.basicConfig(level=level)
 
 _is_setup = False
 
@@ -29,7 +35,7 @@ def lambda_handler(event, context):
     metric_statistics, api_parameters = get_metric_statistics(configurations)
 
     # Used for debugging.
-    print("Statistics from CloudWatch Metrics: %s" % metric_statistics)
+    logger.debug("Statistics from CloudWatch Metrics: %s" % metric_statistics)
 
     # Format metric data to Humio event data.
     humio_events = create_humio_events(metric_statistics, api_parameters)
@@ -39,7 +45,7 @@ def lambda_handler(event, context):
 
     # Debug the response.
     response = request.text
-    print("Got response %s from Humio." % response)
+    logger.debug("Got response %s from Humio." % response)
 
 
 def get_metric_statistics(configurations):
@@ -69,7 +75,7 @@ def get_metric_statistics(configurations):
             api_parameters["EndTime"] = api_parameters["EndTime"].replace(tzinfo=timezone.utc).isoformat()
 
         # Used for debugging.
-        print("Start time: %s, End time: %s" % (api_parameters["StartTime"], api_parameters["EndTime"]))
+        logger.debug("Start time: %s, End time: %s" % (api_parameters["StartTime"], api_parameters["EndTime"]))
 
         # Make GetMetricStatistics API request.
         metric_statistics = metric_client.get_metric_statistics(
@@ -95,7 +101,7 @@ def create_humio_events(metrics, api_parameters):
     humio_events = []
 
     # Used for debuggin.
-    print("Datapoints: %s" % metrics["Datapoints"])
+    logger.debug("Datapoints: %s" % metrics["Datapoints"])
 
     # Create one Humio event per datapoint/timestamp.
     for datapoint in metrics["Datapoints"]:
