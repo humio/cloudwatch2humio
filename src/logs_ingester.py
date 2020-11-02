@@ -5,8 +5,9 @@ import os
 import logging
 
 level = os.getenv("log_level", "INFO")
-logger = logging.getLogger()
 logging.basicConfig(level=level)
+logger = logging.getLogger()
+logger.setLevel(level)
 
 # False when setup has not been performed.
 _is_setup = False

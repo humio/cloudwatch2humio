@@ -7,8 +7,9 @@ import requests
 import logging
 
 level = os.getenv("log_level", "INFO")
-logger = logging.getLogger()
 logging.basicConfig(level=level)
+logger = logging.getLogger()
+logger.setLevel(level)
 
 def setup():
     """
