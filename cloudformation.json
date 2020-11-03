@@ -18,11 +18,6 @@
       "Default" : "",
       "NoEcho" : true
     },
-    "HumioLambdaLogRetention" : {
-      "Type" : "Number",
-      "Description" : "Number of days to retain CloudWatch logs from the Humio Lambda functions.",
-      "Default": 1
-    },
     "EnableCloudWatchLogsAutoSubscription" : {
       "Type" : "String",
       "AllowedValues" : [
@@ -229,8 +224,7 @@
       "Properties" : {
         "LogGroupName" : {
           "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchLogsIngester" } ] ]
-        },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        }
       }
     },
     "HumioCloudWatchLogsSubscriber" : {
@@ -296,8 +290,7 @@
       "Properties" : {
         "LogGroupName" : {
           "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchLogsSubscriber" } ] ]
-        },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        }
       }
     },
     "HumioCloudWatchLogsBackfiller" : {
@@ -350,8 +343,7 @@
       "Properties" : {
         "LogGroupName" : {
           "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchLogsBackfiller" } ] ]
-        },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        }
       }
     },
     "HumioBackfillerAutoRunner" : {
@@ -514,8 +506,7 @@
       "Properties" : {
         "LogGroupName" : {
           "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchMetricIngester" } ] ]
-        },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        }
       }
     },
     "HumioCloudWatchMetricStatisticsIngester" : {
@@ -575,8 +566,7 @@
       "Properties" : {
         "LogGroupName" : {
           "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchMetricStatisticsIngester" } ] ]
-        },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        }
       }
     }
   }
