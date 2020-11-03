@@ -38,7 +38,7 @@
       "Default" : ""
     },
     "EnableCloudWatchLogsBackfillerAutoRun" : {
-      "Type" : "String", 
+      "Type" : "String",
       "AllowedValues" : [
         "true",
         "false"
@@ -71,7 +71,8 @@
     "Version" : {
       "Type" : "String",
       "Description" : "The version of the integration you want installed.",
-      "Default" : "v1.0.0"
+      "AllowedValues" : ["v1.0.0", "v1.1.0", "v1.2.0"],
+      "Default" : "v1.2.0"
     }
   },
   "Conditions" : {
@@ -79,7 +80,7 @@
       "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsAutoSubscription" }, "true" ]
     },
     "CreateHumioBackfillerAutoRunner" : {
-      "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsBackfillerAutoRun" }, "true" ]     
+      "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsBackfillerAutoRun" }, "true" ]
     },
     "ConfigureVPCForIngesterLambdas" : {
       "Fn::Equals" : [ { "Ref" : "EnableVPCForIngesterLambdas" }, "true" ]
