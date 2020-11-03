@@ -3,7 +3,12 @@ import json
 import os
 import helpers
 import requests
+import logging
 
+level = os.getenv("log_level", "INFO")
+logging.basicConfig(level=level)
+logger = logging.getLogger()
+logger.setLevel(level)
 
 def lambda_handler(event, context):
     """
@@ -82,7 +87,7 @@ def lambda_handler(event, context):
                 )
             # We are now subscribed.
             else:
-                print("We are already subscribed to %s" % log_group["logGroupName"])
+                logger.debug("We are already subscribed to %s" % log_group["logGroupName"])
         # When there are no subscription filters, let us subscribe!
         else:
             helpers.create_subscription(
@@ -107,4 +112,4 @@ def send_custom_resource_response(event, context):
                 data=json.dumps(response_content)
             )
             # Used for debugging. 
-            print("Response status from Custom Resource: %s " % response.status_code)
+            logger.debug("Response status from Custom Resource: %s " % response.status_code)

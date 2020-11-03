@@ -4,7 +4,12 @@ import re
 import os
 import json
 import requests
+import logging
 
+level = os.getenv("log_level", "INFO")
+logging.basicConfig(level=level)
+logger = logging.getLogger()
+logger.setLevel(level)
 
 def setup():
     """
@@ -45,7 +50,7 @@ def ingest_events(humio_events, host_type):
     # Prepare events to be sent to Humio.
     wrapped_data = [{"tags": {"host": host_type}, "events": humio_events}]
 
-    print("Data being sent to Humio: %s" % wrapped_data)
+    logger.debug("Data being sent to Humio: %s" % wrapped_data)
 
     # Make request. 
     request = http_session.post(
@@ -92,12 +97,12 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
     """   
     # We cannot subscribe to the log group that our stdout/err goes to.
     if context.log_group_name == log_group_name:
-        print("Skipping our own log group name...")
+        logger.debug("Skipping our own log group name...")
     # And we do not want to subscribe to other Humio log ingesters - if there are any. 
     if "HumioCloudWatchLogsIngester" in log_group_name:
-        print("Skipping cloudwatch2humio ingesters...") 
+        logger.debug("Skipping cloudwatch2humio ingesters...")
     else:
-        print("Creating subscription for %s" % log_group_name)
+        logger.info("Creating subscription for %s" % log_group_name)
         try:
             log_client.put_subscription_filter(
                 logGroupName=log_group_name,
@@ -106,9 +111,9 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
                 destinationArn=humio_log_ingester_arn,
                 distribution="ByLogStream"
             )
-            print("Successfully subscribed to %s!" % log_group_name)
+            logger.debug("Successfully subscribed to %s!" % log_group_name)
         except Exception as exception:
-            print("Error creating subscription to %s. Exception: %s" % (log_group_name, exception))
+            logger.error("Error creating subscription to %s. Exception: %s" % (log_group_name, exception))
 
 
 def delete_subscription(log_client, log_group_name, filter_name):
@@ -126,7 +131,7 @@ def delete_subscription(log_client, log_group_name, filter_name):
 
     :return: None
     """    
-    print("Deleting subscription for %s" % log_group_name)
+    logger.info("Deleting subscription for %s" % log_group_name)
     log_client.delete_subscription_filter(
         logGroupName=log_group_name,
         filterName=filter_name
