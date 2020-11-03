@@ -1,11 +1,5 @@
 # Changelog
 
-## 1.2.0 (2020-11-03)
-Added retention parameter for the lambdas.
-
-### Added
-- A parameter in the CF file has been added so that retention can be set for the lambdas. 
-
 ## 1.1.0 (2020-11-03)
 Added logging library to allow debug logs to be ignored.
 
