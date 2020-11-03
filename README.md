@@ -3,9 +3,6 @@ This repository contains a set of lambdas for shipping Cloudwatch Logs and Metri
 
 The full documentation regarding installing and using this integration can be found in the official [humio docs](https://docs.humio.com/integrations/platforms/aws-cloudwatch/).
 
-## Requirements
-The *EnableCloudWatchLogsAutoSubscription* option of the integration requires that a CloudTrail is configured, and will create this trail if enabled. This trail keeps a log of all of an AWS account's activity and delivers this data to a S3 bucket, which also will be created. It is important to notice that one trail is free, so if a CloudTrail is already configured for the account, then this will be an additional cost.
-
 ## Vision
 The vision for the CloudWatch to Humio integration, is to create a bridge between Humio and AWS, which enables users to ingest logs and metrics from the AWS CloudWatch service, so that Humio can be used to manage this data.
 
