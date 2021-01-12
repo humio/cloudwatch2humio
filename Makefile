@@ -13,7 +13,7 @@ dependencies:
 	pip3 install -r requirements.txt -t target
 
 target/cloudwatch2humio.zip:
-	(cd target/ && zip -r ../target/v1.2.0_cloudwatch2humio.zip * )
+	(cd target/ && zip -r ../target/v1.2.1_cloudwatch2humio.zip * )
 
 clean:
 	rm -rf target
