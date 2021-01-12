@@ -10,8 +10,6 @@ logging.basicConfig(level=level)
 logger = logging.getLogger()
 logger.setLevel(level)
 
-_is_setup = False
-
 
 def lambda_handler(event, context):
     """
@@ -25,9 +23,7 @@ def lambda_handler(event, context):
 
     :return: None
     """
-    # Persist variables across lambda invocations.
-    if not _is_setup:
-        helpers.setup()
+    helpers.setup()
 
     # Load user defined configurations for the API request. 
     configurations = json.load(open("conf_metric_statistics_ingester.json", "r"))

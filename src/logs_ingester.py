@@ -9,8 +9,6 @@ logging.basicConfig(level=level)
 logger = logging.getLogger()
 logger.setLevel(level)
 
-# False when setup has not been performed.
-_is_setup = False
 
 def lambda_handler(event, context):
     """
@@ -25,9 +23,7 @@ def lambda_handler(event, context):
 
     :return: None
     """
-    # Persist variables across lambda invocations.
-    if not _is_setup:
-        helpers.setup()
+    helpers.setup()
 
     # Decode and unzip the log data.
     decoded_event = helpers.decode_event(event)
