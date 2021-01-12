@@ -61,7 +61,7 @@
     },
     "SubnetIds" : {
       "Type" : "CommaDelimitedList",
-      "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lambda functions will be deployed into. Only required if VPC is enabled."
+      "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lamda functions will be deployed into. Only required if VPC is enabled."
     },
     "HumioLambdaLogLevel" : {
       "Type" : "String",
@@ -176,9 +176,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : "cloudwatch2humio",
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -237,9 +235,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : "cloudwatch2humio",
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -304,9 +300,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : "cloudwatch2humio",
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -362,6 +356,71 @@
         "StackName" : { "Ref" : "AWS::StackName" }
       }
     },
+    "HumioCloudWatchLogsSubscriberS3Bucket" : {
+      "Condition" : "CreateAutoSubscriptionResources",
+      "Type" : "AWS::S3::Bucket",
+      "Properties" : {
+        "AccessControl" : "BucketOwnerFullControl",
+        "BucketName" : {
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio", "cloudtrail" ] ]
+        }
+      }
+    },
+    "HumioCloudWatchLogsSubscriberS3BucketPolicy" : {
+      "Condition" : "CreateAutoSubscriptionResources",
+      "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3Bucket" ],
+      "Type" : "AWS::S3::BucketPolicy",
+      "Properties" : {
+        "Bucket" : { "Ref" : "HumioCloudWatchLogsSubscriberS3Bucket" },
+        "PolicyDocument" : {
+          "Version" : "2012-10-17",
+          "Statement" : [
+            {
+              "Sid" : "AWSCloudTrailAclCheck20150319",
+              "Effect" : "Allow",
+              "Principal" : {
+                "Service" : "cloudtrail.amazonaws.com"
+              },
+              "Action" : "s3:GetBucketAcl",
+              "Resource" : {
+                "Fn::GetAtt" : [ "HumioCloudWatchLogsSubscriberS3Bucket", "Arn" ]
+              }
+            },
+            {
+              "Sid" : "AWSCloudTrailWrite20150319",
+              "Effect" : "Allow",
+              "Principal" : {
+                "Service" : "cloudtrail.amazonaws.com"
+              },
+              "Action" : "s3:PutObject",
+              "Resource" : {
+                "Fn::Join" : [ "", [ { "Fn::GetAtt" : [ "HumioCloudWatchLogsSubscriberS3Bucket", "Arn" ] }, "/AWSLogs/", { "Ref" : "AWS::AccountId" }, "/*" ] ]
+              },
+              "Condition" : {
+                "StringEquals" : { "s3:x-amz-acl" : "bucket-owner-full-control" }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "HumioCloudWatchLogsSubscriberCloudTrail" : {
+      "Condition" : "CreateAutoSubscriptionResources",
+      "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3BucketPolicy" ],
+      "Type" : "AWS::CloudTrail::Trail",
+      "Properties" : {
+        "EnableLogFileValidation" : false,
+        "IncludeGlobalServiceEvents" : true,
+        "IsMultiRegionTrail" : true,
+        "IsLogging" : true,
+        "S3BucketName" : {
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio", "cloudtrail" ] ]
+        },
+        "TrailName" : {
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio", { "Ref" : "AWS::AccountId" } ] ]
+        }
+      }
+    },
     "HumioCloudWatchLogsSubscriberEventRule" : {
       "Condition" : "CreateAutoSubscriptionResources",
       "DependsOn" : [ "HumioCloudWatchLogsSubscriber" ],
@@ -396,9 +455,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : "cloudwatch2humio",
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -457,9 +514,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : "cloudwatch2humio",
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
