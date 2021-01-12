@@ -11,9 +11,14 @@ logging.basicConfig(level=level)
 logger = logging.getLogger()
 logger.setLevel(level)
 
+_is_setup = False
+
 def setup():
     """
     Sets up variables that should persists across Lambda invocations.
+
+    This can be called every invocation but we will only run it once
+    per Lambda instance.
     """
     global humio_host
     global humio_protocol
@@ -21,10 +26,14 @@ def setup():
     global http_session
     global _is_setup
 
+    if _is_setup:
+        return
+
     humio_host = os.environ["humio_host"]
     humio_protocol = os.environ["humio_protocol"]
     humio_ingest_token = os.environ["humio_ingest_token"]
     http_session = requests.Session()
+
     _is_setup = True
 
 
