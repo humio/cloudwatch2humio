@@ -13,6 +13,7 @@ logger.setLevel(level)
 
 _is_setup = False
 
+
 def setup():
     """
     Sets up variables that should persists across Lambda invocations.

@@ -10,6 +10,7 @@ logging.basicConfig(level=level)
 logger = logging.getLogger()
 logger.setLevel(level)
 
+
 def lambda_handler(event, context):
     """
     Back-filler function that lists all log groups and subscribes to them.

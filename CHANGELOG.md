@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 (2021-01-12)
+Performance regression fix.
+
+### Changed
+- A setup function has now been scoped properly and will thus not be called unnecessarily, which affected performance time.
+
 ## 1.2.0 (2020-11-03)
 Added retention parameter for the lambdas.
 
