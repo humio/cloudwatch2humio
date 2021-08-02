@@ -45,18 +45,18 @@ Following is described how to set up the integration for local development.
 
       3. In the *target* folder, zip all files into *v0.0.0_YOUR-ZIP-FILE.zip*. Choose whatever version number is relevant to you.  
 
-3. Create an AWS S3 bucket using the following command: 
+3. Create an AWS S3 bucket for each region you wish to deploy to using the following command: 
 
     ```
-    aws s3api create-bucket --bucket YOUR-HUMIO-BUCKET --create-bucket-configuration LocationConstraint=YOUR-REGION
+    aws s3api create-bucket --bucket YOUR-HUMIO-BUCKET-PREFIX-YOUR-REGION --create-bucket-configuration LocationConstraint=YOUR-REGION
     ```
 
-    - The name of the AWS S3 bucket must be the same as the one specified in the CloudFormation file. The default name is `humio-public-YOUR-REGION`.
+    - The prefix of the AWS S3 bucket must be the same as the one specified in the CloudFormation file with the region appended to it. The default name is `humio-public-YOUR-REGION`.
 
 4. Upload the zip file to the AWS S3 bucket: 
 
     ```
-    aws s3 cp target/v0.0.0_YOUR-ZIP-FILE.zip s3://YOUR-HUMIO-BUCKET/
+    aws s3 cp target/v0.0.0_YOUR-ZIP-FILE.zip s3://YOUR-HUMIO-BUCKET-PREFIX-YOUR-REGION/
     ``` 
 
 5. Create a *parameters.json* file in the project root folder, and specify the CloudFormation parameters, for example: 

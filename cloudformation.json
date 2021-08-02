@@ -68,6 +68,11 @@
       "AllowedValues" : ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
       "Default" : "INFO"
     },
+    "SourceCodeS3BucketPrefix" : {
+      "Type" : "String",
+      "Description" : "The prefix of the S3 bucket name where your Lambda code has been uploaded to. The actual bucket name will be your prefix with \"-<region>\" appended to it (e.g. my-bucket will actually use my-bucket-us-west-2)",
+      "Default" : "humio-public"
+    },
     "Version" : {
       "Type" : "String",
       "Description" : "The version of the integration you want installed.",
@@ -177,7 +182,10 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
+            "Fn::Join" : [
+              "-",
+              [ { "Ref" : "SourceCodeS3BucketPrefix" }, { "Ref" : "AWS::Region"}]
+            ]
           },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
@@ -238,7 +246,7 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
+            "Fn::Join" : [ "-", [ { "Ref" : "SourceCodeS3BucketPrefix"}, { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
@@ -305,7 +313,7 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
+            "Fn::Join" : [ "-", [ {"Ref" : "SourceCodeS3BucketPrefix"}, { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
@@ -462,7 +470,7 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
+            "Fn::Join" : [ "-", [ {"Ref" : "SourceCodeS3BucketPrefix"}, { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
@@ -523,7 +531,7 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
+            "Fn::Join" : [ "-", [ {"Ref" : "SourceCodeS3BucketPrefix"}, { "Ref" : "AWS::Region" } ] ]
           },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
