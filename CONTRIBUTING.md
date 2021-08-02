@@ -80,6 +80,10 @@ Following is described how to set up the integration for local development.
             "ParameterValue": "humio" 
         },
         {
+            "ParameterKey": "SourceCodeS3BucketPrefix",
+            "ParameterValue": "YOUR-SOURCE-CODE-BUCKET-PREFIX"
+        }
+        {
             "ParameterKey": "Version",
             "ParameterValue": "YOUR-VERSION-HERE"
         }
