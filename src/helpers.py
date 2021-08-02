@@ -108,22 +108,25 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
     # We cannot subscribe to the log group that our stdout/err goes to.
     if context.log_group_name == log_group_name:
         logger.debug("Skipping our own log group name...")
+        return
+
     # And we do not want to subscribe to other Humio log ingesters - if there are any. 
     if "HumioCloudWatchLogsIngester" in log_group_name:
         logger.debug("Skipping cloudwatch2humio ingesters...")
-    else:
-        logger.info("Creating subscription for %s" % log_group_name)
-        try:
-            log_client.put_subscription_filter(
-                logGroupName=log_group_name,
-                filterName="%s-humio_ingester" % log_group_name,
-                filterPattern="",  # Matching everything.
-                destinationArn=humio_log_ingester_arn,
-                distribution="ByLogStream"
-            )
-            logger.debug("Successfully subscribed to %s!" % log_group_name)
-        except Exception as exception:
-            logger.error("Error creating subscription to %s. Exception: %s" % (log_group_name, exception))
+        return
+
+    logger.info("Creating subscription for %s" % log_group_name)
+    try:
+        log_client.put_subscription_filter(
+            logGroupName=log_group_name,
+            filterName="%s-humio_ingester" % log_group_name,
+            filterPattern="",  # Matching everything.
+            destinationArn=humio_log_ingester_arn,
+            distribution="ByLogStream"
+        )
+        logger.debug("Successfully subscribed to %s!" % log_group_name)
+    except Exception as exception:
+        logger.error("Error creating subscription to %s. Exception: %s" % (log_group_name, exception))
 
 
 def delete_subscription(log_client, log_group_name, filter_name):
