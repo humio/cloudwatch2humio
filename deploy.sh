@@ -9,6 +9,7 @@ aws s3 cp --acl public-read cloudformation-no-trail.json s3://humio-public-us-ea
 aws s3 cp --acl public-read target/v1.2.1_cloudwatch2humio.zip s3://humio-public-eu-central-1/ --region eu-central-1
 aws s3 cp --acl public-read target/v1.2.1_cloudwatch2humio.zip s3://humio-public-eu-west-1/ --region eu-west-1
 aws s3 cp --acl public-read target/v1.2.1_cloudwatch2humio.zip s3://humio-public-eu-west-2/ --region eu-west-2
+aws s3 cp --acl public-read target/v1.2.1_cloudwatch2humio.zip s3://humio-public-eu-west-3/ --region eu-west-3
 aws s3 cp --acl public-read target/v1.2.1_cloudwatch2humio.zip s3://humio-public-eu-north-1/  --region eu-north-1
 
 aws s3 cp --acl public-read target/v1.2.1_cloudwatch2humio.zip s3://humio-public-us-east-1/ --region us-east-1
