@@ -1,7 +1,7 @@
 # CloudWatch2Humio
 This repository contains a set of lambdas for shipping Cloudwatch Logs and Metrics to Humio.
 
-The full documentation regarding installing and using this integration can be found in the official [humio docs](https://docs.humio.com/integrations/platforms/aws-cloudwatch/).
+The full documentation regarding installing and using this integration can be found in the official [humio library](https://library.humio.com/reference/log-formats/amazon-cloudwatch/).
 
 ## Vision
 The vision for the CloudWatch to Humio integration, is to create a bridge between Humio and AWS, which enables users to ingest logs and metrics from the AWS CloudWatch service, so that Humio can be used to manage this data.
