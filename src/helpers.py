@@ -63,21 +63,13 @@ def ingest_events(humio_events, host_type):
     logger.debug("Data being sent to Humio: %s" % wrapped_data)
 
     # Make request but raise an exception for network issues
-    try:
-        request = http_session.post(
-            humio_url,
-            data=json.dumps(wrapped_data),
-            headers=humio_headers
-        )
-    except requests.exceptions.HTTPError as errh:
-        print("Http Error:", errh)
-    except requests.exceptions.ConnectionError as errc:
-        print("Error Connecting:", errc)
-    except requests.exceptions.Timeout as errt:
-        print("Timeout Error:", errt)
-    except requests.exceptions.RequestException as err:
-        print("Request Error: ", err)
-
+    request = http_session.post(
+        humio_url,
+        data=json.dumps(wrapped_data),
+        headers=humio_headers
+    )
+    request.raise_for_status()
+    
     return request
 
 
