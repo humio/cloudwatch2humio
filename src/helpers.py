@@ -63,12 +63,18 @@ def ingest_events(humio_events, host_type):
     logger.debug("Data being sent to Humio: %s" % wrapped_data)
 
     # Make request. 
-    request = http_session.post(
+    response = http_session.post(
         humio_url,
         data=json.dumps(wrapped_data),
         headers=humio_headers
     )
-    return request
+    try:
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logger.error("Got error %s from Humio." % response.text, exc_info= e)
+
+    logger.debug("Got response %s from Humio." % response.text)
+    return response
 
 
 def decode_event(event):

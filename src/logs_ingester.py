@@ -70,9 +70,4 @@ def lambda_handler(event, context):
         })
 
     # Make request to Humio.
-    request = helpers.ingest_events(humio_events, 'cloudwatch_logs')
-
-    response = request.text
-
-    # Debug output.
-    logger.debug("Got response %s from Humio." % response)
+    helpers.ingest_events(humio_events, 'cloudwatch_logs')
