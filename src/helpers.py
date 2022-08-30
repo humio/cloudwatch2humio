@@ -72,8 +72,9 @@ def ingest_events(humio_events, host_type):
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         logger.error("Got error %s from Humio." % response.text, exc_info= e)
+    else:
+        logger.debug("Got response %s from Humio." % response.text)
 
-    logger.debug("Got response %s from Humio." % response.text)
     return response
 
 
