@@ -71,7 +71,7 @@
     "Version" : {
       "Type" : "String",
       "Description" : "The version of the integration you want installed.",
-      "Default" : "v1.2.1"
+      "Default" : "v1.2.2"
     }
   },
   "Conditions" : {
