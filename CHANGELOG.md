@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2 (2022-08-30)
+Added additional login at ingest error
+
+### Added
+- Logging for when ingest into Humio fails
+
 ## 1.2.1 (2021-01-12)
 Performance regression fix.
 
