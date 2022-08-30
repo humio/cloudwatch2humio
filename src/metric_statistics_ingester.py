@@ -38,11 +38,7 @@ def lambda_handler(event, context):
     humio_events = create_humio_events(metric_statistics, api_parameters)
 
     # Send Humio event data to Humio.
-    request = helpers.ingest_events(humio_events, "cloudwatch_metrics")
-
-    # Debug the response.
-    response = request.text
-    logger.debug("Got response %s from Humio." % response)
+    helpers.ingest_events(humio_events, "cloudwatch_metrics")
 
 
 def get_metric_statistics(configurations):
