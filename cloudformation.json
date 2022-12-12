@@ -85,6 +85,28 @@
       "Fn::Equals" : [ { "Ref" : "EnableVPCForIngesterLambdas" }, "true" ]
     }
   },
+  "Metadata": {
+    "AWS::CloudFormation::Interface" : {
+      "ParameterGroups" : [
+        {
+          "Label" : { "default" : "Humio Settings" },
+          "Parameters" : [ "HumioProtocol", "HumioHost", "HumioIngestToken" ]
+        },
+        {
+          "Label" : { "default" : "VPC Settings"},
+          "Parameters" : [ "EnableVPCForIngesterLambdas", "SecurityGroupIds", "SubnetIds" ]
+        },
+        {
+          "Label" : { "default" : "Lambda Settings" },
+          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
+        },
+        {
+          "Label" : { "default" : "Other" },
+          "Parameters" : [ "Version" ]
+        }
+      ]
+    }
+  },
   "Resources" : {
     "HumioCloudWatchRole" : {
       "Type" : "AWS::IAM::Role",
