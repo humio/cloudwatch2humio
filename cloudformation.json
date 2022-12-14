@@ -46,6 +46,15 @@
       "Description" : "Make the backfiller run automatically when created. Set to 'true' to enable.",
       "Default" : "true"
     },
+    "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas" : {
+      "Type" : "String",
+      "AllowedValues" : [
+        "true",
+        "false"
+      ],
+      "Description" : "Choose whether the metric ingester and the metric ingester statistics lambdas should be created. These are not necessary for getting CloudWatch logs into Humio.",
+      "Default" : "false"
+    },
     "EnableVPCForIngesterLambdas" : {
       "Type" : "String",
       "AllowedValues" : [
@@ -83,6 +92,9 @@
     },
     "ConfigureVPCForIngesterLambdas" : {
       "Fn::Equals" : [ { "Ref" : "EnableVPCForIngesterLambdas" }, "true" ]
+    },
+    "CreateMetricAndMetricStatisticsLambdas" : {
+        "Fn::Equals" : [ { "Ref" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas" }, "true" ]
     }
   },
   "Metadata": {
@@ -98,7 +110,7 @@
         },
         {
           "Label" : { "default" : "Lambda Settings" },
-          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
+          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
         },
         {
           "Label" : { "default" : "Other" },
@@ -479,6 +491,7 @@
       }
     },
     "HumioCloudWatchMetricIngester" : {
+      "Condition" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas",
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
@@ -520,6 +533,7 @@
       }
     },
     "HumioCloudWatchMetricIngesterPermission" : {
+      "Condition" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas",
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
@@ -530,6 +544,7 @@
       }
     },
     "HumioCloudWatchMetricIngesterLogGroup" : {
+      "Condition" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas",
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
@@ -540,6 +555,7 @@
       }
     },
     "HumioCloudWatchMetricStatisticsIngester" : {
+      "Condition" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas",
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
@@ -581,6 +597,7 @@
       }
     },
     "HumioCloudWatchMetricStatisticsIngesterPermission" : {
+      "Condition" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas",
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
@@ -591,6 +608,7 @@
       }
     },
     "HumioCloudWatchMetricStatisticsIngesterLogGroup" : {
+      "Condition" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas",
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
