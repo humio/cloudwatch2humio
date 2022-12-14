@@ -32,6 +32,15 @@
       "Description" : "Make the log ingester automatically subscribe to new log groups specified with the logs subscription prefix parameter. Set to 'true' to enable.",
       "Default" : "true"
     },
+    "CreateCloudTrailForAutoSubscription" :{
+      "Type" : "String",
+      "AllowedValues" : [
+        "true",
+        "false"
+      ],
+      "Description" : "If autosubscription to new logs is desired, but instead of the needed resources (a CloudTrail and a S3 bucket) being created now existing resources can be used instead. To use existing resources set this to 'false'. Note that this parameter is only considered if autosubscription is enabled.",
+      "Default" : "true"
+    },
     "HumioCloudWatchLogsSubscriptionPrefix" : {
       "Type" : "String",
       "Description" : "Humio will only autosubscribe to log groups with the prefix specified.",
@@ -77,19 +86,25 @@
       "AllowedValues" : ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
       "Default" : "INFO"
     },
+    "LambdaFilesLocation" : {
+      "Type" : "String",
+      "Description": "S3 bucket where the lambda code files can be located. Note that the S3Key used to find the zip file is VERSION_cloudwatch2humio.zip, and should be present in the bucket.",
+      "Default": {
+        "Fn::Join": [
+          "-",
+          [
+            "humio-public",
+            {
+              "Ref": "AWS::Region"
+            }
+          ]
+        ]
+      }
+    },
     "Version" : {
       "Type" : "String",
       "Description" : "The version of the integration you want installed.",
       "Default" : "v1.2.2"
-    },
-    "CreateCloudTrailForAutoSubscription" :{
-      "Type" : "String",
-      "AllowedValues" : [
-        "true",
-        "false"
-      ],
-      "Description" : "If autosubscription to new logs is desired, but instead of the needed resources (a CloudTrail and a S3 bucket) being created now existing resources can be used instead. To use existing resources set this to 'false'. Note that this parameter is only considered if autosubscription is enabled.",
-      "Default" : "true"
     }
   },
   "Conditions" : {
@@ -232,9 +247,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -293,9 +306,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -360,9 +371,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -518,9 +527,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -582,9 +589,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::Join" : [ "-", [ "humio-public", { "Ref" : "AWS::Region" } ] ]
-          },
+          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
