@@ -34,7 +34,7 @@
     },
     "HumioCloudWatchLogsSubscriptionPrefix" : {
       "Type" : "String",
-      "Description" : "Humio will only subscribe to log groups with the prefix specified.",
+      "Description" : "Humio will only autosubscribe to log groups with the prefix specified.",
       "Default" : ""
     },
     "EnableCloudWatchLogsBackfillerAutoRun" : {
@@ -52,7 +52,7 @@
         "true",
         "false"
       ],
-      "Description" : "Choose whether the metric ingester and the metric statistics ingester lambdas should be created. These are not necessary for getting CloudWatch logs into Humio.",
+      "Description" : "Choose whether the metric ingester and the metric statistics ingester lambdas should be created. These are not necessary for getting CloudWatch logs into Humio. Set to 'true' to create.",
       "Default" : "false"
     },
     "EnableVPCForIngesterLambdas" : {
@@ -70,7 +70,7 @@
     },
     "SubnetIds" : {
       "Type" : "CommaDelimitedList",
-      "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lamda functions will be deployed into. Only required if VPC is enabled."
+      "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lambda functions will be deployed into. Only required if VPC is enabled."
     },
     "HumioLambdaLogLevel" : {
       "Type" : "String",
@@ -81,11 +81,33 @@
       "Type" : "String",
       "Description" : "The version of the integration you want installed.",
       "Default" : "v1.2.2"
+    },
+    "CreateCloudTrailForAutoSubscription" :{
+      "Type" : "String",
+      "AllowedValues" : [
+        "true",
+        "false"
+      ],
+      "Description" : "If autosubscription to new logs is desired, but instead of the needed resources (a CloudTrail and a S3 bucket) being created now existing resources can be used instead. To use existing resources set this to 'false'. Note that this parameter is only considered if autosubscription is enabled.",
+      "Default" : "true"
     }
   },
   "Conditions" : {
     "CreateAutoSubscriptionResources" : {
       "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsAutoSubscription" }, "true" ]
+    },
+    "CreateCloudTrailAndS3BucketForAutoSubscription" : {
+      "Fn::Equals" : [ { "Ref" : "CreateCloudTrailForAutoSubscription" }, "true" ]
+    },
+    "CreateCloudTrailAndS3BucketAndEnableAutoSubscription" : {
+      "Fn::And" : [
+        {
+          "Condition": "CreateAutoSubscriptionResources"
+        },
+        {
+          "Condition": "CreateCloudTrailAndS3BucketForAutoSubscription"
+        }
+      ]
     },
     "CreateHumioBackfillerAutoRunner" : {
       "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsBackfillerAutoRun" }, "true" ]
@@ -94,7 +116,7 @@
       "Fn::Equals" : [ { "Ref" : "EnableVPCForIngesterLambdas" }, "true" ]
     },
     "CreateMetricAndMetricStatisticsLambdas" : {
-        "Fn::Equals" : [ { "Ref" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas" }, "true" ]
+      "Fn::Equals" : [ { "Ref" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas" }, "true" ]
     }
   },
   "Metadata": {
@@ -110,7 +132,7 @@
         },
         {
           "Label" : { "default" : "Lambda Settings" },
-          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
+          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "CreateCloudTrailForAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
         },
         {
           "Label" : { "default" : "Other" },
@@ -397,7 +419,7 @@
       }
     },
     "HumioCloudWatchLogsSubscriberS3Bucket" : {
-      "Condition" : "CreateAutoSubscriptionResources",
+      "Condition" : "CreateCloudTrailAndS3BucketAndEnableAutoSubscription",
       "Type" : "AWS::S3::Bucket",
       "Properties" : {
         "AccessControl" : "BucketOwnerFullControl",
@@ -407,7 +429,7 @@
       }
     },
     "HumioCloudWatchLogsSubscriberS3BucketPolicy" : {
-      "Condition" : "CreateAutoSubscriptionResources",
+      "Condition" : "CreateCloudTrailAndS3BucketAndEnableAutoSubscription",
       "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3Bucket" ],
       "Type" : "AWS::S3::BucketPolicy",
       "Properties" : {
@@ -445,7 +467,7 @@
       }
     },
     "HumioCloudWatchLogsSubscriberCloudTrail" : {
-      "Condition" : "CreateAutoSubscriptionResources",
+      "Condition" : "CreateCloudTrailAndS3BucketAndEnableAutoSubscription",
       "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3BucketPolicy" ],
       "Type" : "AWS::CloudTrail::Trail",
       "Properties" : {
