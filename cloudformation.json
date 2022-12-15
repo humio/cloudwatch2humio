@@ -43,7 +43,7 @@
     },
     "HumioCloudWatchLogsSubscriptionPrefix" : {
       "Type" : "String",
-      "Description" : "Humio will only autosubscribe to log groups with the prefix specified.",
+      "Description" : "Humio will only autosubscribe using either the backfiller or the autosubscriber to log groups with the prefix specified.",
       "Default" : ""
     },
     "EnableCloudWatchLogsBackfillerAutoRun" : {
@@ -86,20 +86,9 @@
       "AllowedValues" : ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
       "Default" : "INFO"
     },
-    "LambdaFilesLocation" : {
+    "OverrideLambdaFilesLocation" : {
       "Type" : "String",
-      "Description": "S3 bucket where the lambda code files can be located. Note that the S3Key used to find the zip file is VERSION_cloudwatch2humio.zip, and should be present in the bucket.",
-      "Default": {
-        "Fn::Join": [
-          "-",
-          [
-            "humio-public",
-            {
-              "Ref": "AWS::Region"
-            }
-          ]
-        ]
-      }
+      "Description": "An alternative S3 bucket where the lambda code files are located. Note that the S3Key used to find the zip file is VERSION_cloudwatch2humio.zip, and should be present in the S3 bucket. Leave the parameter blank to use the default value, which retrieves the files from a Humio environment - anything else will override the value."
     },
     "Version" : {
       "Type" : "String",
@@ -132,6 +121,9 @@
     },
     "CreateMetricAndMetricStatisticsLambdas" : {
       "Fn::Equals" : [ { "Ref" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas" }, "true" ]
+    },
+    "UseHumioLambdaFilesLocation" : {
+      "Fn::Equals" : [{"Ref" : "OverrideLambdaFilesLocation" }, ""]
     }
   },
   "Metadata": {
@@ -147,7 +139,7 @@
         },
         {
           "Label" : { "default" : "Lambda Settings" },
-          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "CreateCloudTrailForAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
+          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "CreateCloudTrailForAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "HumioLambdaLogLevel", "HumioLambdaLogRetention", "OverrideLambdaFilesLocation" ]
         },
         {
           "Label" : { "default" : "Other" },
@@ -247,7 +239,20 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
+          "S3Bucket" : {
+            "Fn::If" : [ "UseHumioLambdaFilesLocation",
+              {
+                "Fn::Sub": [
+                  "humio-public-${Region}",
+                  {
+                    "Region": {
+                      "Ref": "AWS::Region"
+                    }
+                  }
+                ]
+              }, { "Ref" : "OverrideLambdaFilesLocation" }
+            ]
+          },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -306,7 +311,20 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
+          "S3Bucket" : {
+            "Fn::If" : [ "UseHumioLambdaFilesLocation",
+              {
+                "Fn::Sub": [
+                  "humio-public-${Region}",
+                  {
+                    "Region": {
+                      "Ref": "AWS::Region"
+                    }
+                  }
+                ]
+              }, { "Ref" : "OverrideLambdaFilesLocation" }
+            ]
+          },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -371,7 +389,20 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
+          "S3Bucket" : {
+            "Fn::If" : [ "UseHumioLambdaFilesLocation",
+              {
+                "Fn::Sub": [
+                  "humio-public-${Region}",
+                  {
+                    "Region": {
+                      "Ref": "AWS::Region"
+                    }
+                  }
+                ]
+              }, { "Ref" : "OverrideLambdaFilesLocation" }
+            ]
+          },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -527,7 +558,20 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
+          "S3Bucket" : {
+            "Fn::If" : [ "UseHumioLambdaFilesLocation",
+              {
+                "Fn::Sub": [
+                  "humio-public-${Region}",
+                  {
+                    "Region": {
+                      "Ref": "AWS::Region"
+                    }
+                  }
+                ]
+              }, { "Ref" : "OverrideLambdaFilesLocation" }
+            ]
+          },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -589,7 +633,20 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "LambdaFilesLocation" },
+          "S3Bucket" : {
+            "Fn::If" : [ "UseHumioLambdaFilesLocation",
+              {
+                "Fn::Sub": [
+                  "humio-public-${Region}",
+                  {
+                    "Region": {
+                      "Ref": "AWS::Region"
+                    }
+                  }
+                ]
+              }, { "Ref" : "OverrideLambdaFilesLocation" }
+            ]
+          },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
