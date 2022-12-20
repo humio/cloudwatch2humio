@@ -124,6 +124,16 @@
     },
     "UseHumioLambdaFilesLocation" : {
       "Fn::Equals" : [{"Ref" : "OverrideLambdaFilesLocation" }, ""]
+    },
+    "DoNotCreateResourcesForCopying" : {
+      "Fn::Not" : [{
+        "Fn::Equals": [
+          {
+            "Ref": "OverrideLambdaFilesLocation"
+          },
+          ""
+        ]
+      }]
     }
   },
   "Metadata": {
@@ -241,9 +251,11 @@
       }
     },
     "HumioCloudWatchLambdaZipBucket" : {
+      "Condition" : "DoNotCreateResourcesForCopying",
       "Type" : "AWS::S3::Bucket"
     },
     "HumioCloudWatchCopyZipCustom" : {
+      "Condition" : "DoNotCreateResourcesForCopying",
       "Type" : "Custom::CopyZip",
       "Properties": {
         "ServiceToken": { "Fn::GetAtt" : [ "HumioCloudWatchCopyZipLambda", "Arn" ] },
@@ -253,6 +265,7 @@
       }
     },
     "HumioCloudWatchCopyZipLambda" : {
+      "Condition" : "DoNotCreateResourcesForCopying",
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -267,6 +280,7 @@
       }
     },
     "HumioCloudWatchCopyZipLambdaLogGroup" : {
+      "Condition" : "DoNotCreateResourcesForCopying",
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
