@@ -86,10 +86,6 @@
       "AllowedValues" : ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
       "Default" : "INFO"
     },
-    "OverrideLambdaFilesLocation" : {
-      "Type" : "String",
-      "Description": "An alternative S3 bucket where the lambda code files are located. Note that the S3Key used to find the zip file is VERSION_cloudwatch2humio.zip, and should be present in the S3 bucket. Leave the parameter blank to use the default value, which retrieves the files from a Humio environment - anything else will override the value."
-    },
     "Version" : {
       "Type" : "String",
       "Description" : "The version of the integration you want installed.",
@@ -136,7 +132,7 @@
         },
         {
           "Label" : { "default" : "Lambda Settings" },
-          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "CreateCloudTrailForAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "HumioLambdaLogLevel", "HumioLambdaLogRetention", "OverrideLambdaFilesLocation" ]
+          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "CreateCloudTrailForAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
         },
         {
           "Label" : { "default" : "Other" },
