@@ -266,6 +266,16 @@
         }
       }
     },
+    "HumioCloudWatchCopyZipLambdaLogGroup" : {
+      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "Type" : "AWS::Logs::LogGroup",
+      "Properties" : {
+        "LogGroupName" : {
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchCopyZipLambda" } ] ]
+        },
+        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+      }
+    },
     "HumioCloudWatchLogsIngester" : {
       "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
@@ -331,7 +341,7 @@
       }
     },
     "HumioCloudWatchLogsSubscriber" : {
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
@@ -401,7 +411,7 @@
       }
     },
     "HumioCloudWatchLogsBackfiller" : {
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
@@ -562,7 +572,7 @@
     },
     "HumioCloudWatchMetricIngester" : {
       "Condition" : "CreateMetricAndMetricStatisticsLambdas",
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
@@ -629,7 +639,7 @@
     },
     "HumioCloudWatchMetricStatisticsIngester" : {
       "Condition" : "CreateMetricAndMetricStatisticsLambdas",
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
