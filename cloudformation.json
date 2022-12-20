@@ -121,19 +121,6 @@
     },
     "CreateMetricAndMetricStatisticsLambdas" : {
       "Fn::Equals" : [ { "Ref" : "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas" }, "true" ]
-    },
-    "UseHumioLambdaFilesLocation" : {
-      "Fn::Equals" : [{"Ref" : "OverrideLambdaFilesLocation" }, ""]
-    },
-    "DoNotCreateResourcesForCopying" : {
-      "Fn::Not" : [{
-        "Fn::Equals": [
-          {
-            "Ref": "OverrideLambdaFilesLocation"
-          },
-          ""
-        ]
-      }]
     }
   },
   "Metadata": {
@@ -251,11 +238,9 @@
       }
     },
     "HumioCloudWatchLambdaZipBucket" : {
-      "Condition" : "DoNotCreateResourcesForCopying",
       "Type" : "AWS::S3::Bucket"
     },
     "HumioCloudWatchCopyZipCustom" : {
-      "Condition" : "DoNotCreateResourcesForCopying",
       "Type" : "Custom::CopyZip",
       "Properties": {
         "ServiceToken": { "Fn::GetAtt" : [ "HumioCloudWatchCopyZipLambda", "Arn" ] },
@@ -265,7 +250,6 @@
       }
     },
     "HumioCloudWatchCopyZipLambda" : {
-      "Condition" : "DoNotCreateResourcesForCopying",
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -280,7 +264,6 @@
       }
     },
     "HumioCloudWatchCopyZipLambdaLogGroup" : {
-      "Condition" : "DoNotCreateResourcesForCopying",
       "DependsOn" : [ "HumioCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
@@ -295,12 +278,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::If" : [ "UseHumioLambdaFilesLocation",
-              { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-              { "Ref" : "OverrideLambdaFilesLocation" }
-            ]
-          },
+          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -359,12 +337,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::If" : [ "UseHumioLambdaFilesLocation",
-              { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-              { "Ref" : "OverrideLambdaFilesLocation" }
-            ]
-          },
+          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -429,12 +402,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::If" : [ "UseHumioLambdaFilesLocation",
-              { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-              { "Ref" : "OverrideLambdaFilesLocation" }
-            ]
-          },
+          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -590,12 +558,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::If" : [ "UseHumioLambdaFilesLocation",
-              { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-              { "Ref" : "OverrideLambdaFilesLocation" }
-            ]
-          },
+          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
@@ -657,12 +620,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : {
-            "Fn::If" : [ "UseHumioLambdaFilesLocation",
-              { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-              { "Ref" : "OverrideLambdaFilesLocation" }
-            ]
-          },
+          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
           "S3Key" : {
             "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
           }
