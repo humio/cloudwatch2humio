@@ -337,16 +337,8 @@
         "Code" : {
           "S3Bucket" : {
             "Fn::If" : [ "UseHumioLambdaFilesLocation",
-              {
-                "Fn::Sub": [
-                  "humio-public-${Region}",
-                  {
-                    "Region": {
-                      "Ref": "AWS::Region"
-                    }
-                  }
-                ]
-              }, { "Ref" : "OverrideLambdaFilesLocation" }
+              { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+              { "Ref" : "OverrideLambdaFilesLocation" }
             ]
           },
           "S3Key" : {
@@ -415,16 +407,8 @@
         "Code" : {
           "S3Bucket" : {
             "Fn::If" : [ "UseHumioLambdaFilesLocation",
-              {
-                "Fn::Sub": [
-                  "humio-public-${Region}",
-                  {
-                    "Region": {
-                      "Ref": "AWS::Region"
-                    }
-                  }
-                ]
-              }, { "Ref" : "OverrideLambdaFilesLocation" }
+              { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+              { "Ref" : "OverrideLambdaFilesLocation" }
             ]
           },
           "S3Key" : {
@@ -584,16 +568,8 @@
         "Code" : {
           "S3Bucket" : {
             "Fn::If" : [ "UseHumioLambdaFilesLocation",
-              {
-                "Fn::Sub": [
-                  "humio-public-${Region}",
-                  {
-                    "Region": {
-                      "Ref": "AWS::Region"
-                    }
-                  }
-                ]
-              }, { "Ref" : "OverrideLambdaFilesLocation" }
+              { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+              { "Ref" : "OverrideLambdaFilesLocation" }
             ]
           },
           "S3Key" : {
@@ -659,16 +635,8 @@
         "Code" : {
           "S3Bucket" : {
             "Fn::If" : [ "UseHumioLambdaFilesLocation",
-              {
-                "Fn::Sub": [
-                  "humio-public-${Region}",
-                  {
-                    "Region": {
-                      "Ref": "AWS::Region"
-                    }
-                  }
-                ]
-              }, { "Ref" : "OverrideLambdaFilesLocation" }
+              { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+              { "Ref" : "OverrideLambdaFilesLocation" }
             ]
           },
           "S3Key" : {
