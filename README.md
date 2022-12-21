@@ -26,17 +26,3 @@ The active maintainers involved with this project include:
 
    * [Suzanna Volkov](https://github.com/Suzanna-Volkov)
 
-## CloudFormation Files
-There are two versions of the CloudFormation file; one which creates a CloudTrail with a S3 bucket for log storage, 
-and one which does not create these resources.
-The reason for this is that every AWS account only allows for one free CloudTrail, 
-and adding another will therefore be an additional cost for setting up this integration if one is already present. 
-By introducing two versions of the CloudFormation file, 
-it is possible for the user to choose whether they want to create a CloudTrail specifically to be used with this integration, 
-or to use a one which already exists.
-
-***It is thus required when creating a stack using the "no-trail" CloudFormation file that an existing CloudTrail with "management events" enabled already to be present for the account!***
-
-The CloudTrail is used by the integration for discovering new log groups in CloudWatch, 
-which makes it possible for the integration to automatically subscribe to these when they appear.
-This is only done if the parameter `EnableCloudWatchLogsAutoSubscription` is set to **true**.
