@@ -26,3 +26,10 @@ The active maintainers involved with this project include:
 
    * [Suzanna Volkov](https://github.com/Suzanna-Volkov)
 
+## How this integration works
+The integration consists of a CloudFormation template and some Python code files used for lambda functions. The lambda code files are zipped and uploaded to a public S3 bucket hosted by Humio. 
+When creating a CloudStack using this CloudFormation template, some additional helper resources are created to help copy the lambda code files from the S3 bucket hosting the files to a newly created regional S3 bucket. 
+This is so that we do not have to create buckets in each supported region as the CloudFormation has a restriction that it can only retrieve lambda code files from a bucket located in the same region as the stack.
+
+When all the resources are created, the lambda functions will start sending logs to the Humio host, which was determined through setup. 
+Chosen log groups are subscribed to, and whenever new logs arrive, these will be forwarded to Humio. 
