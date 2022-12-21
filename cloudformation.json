@@ -90,6 +90,11 @@
       "Type" : "String",
       "Description" : "The version of the integration you want installed.",
       "Default" : "v1.3.0"
+    },
+    "S3BucketContainingLambdaCodeFiles" : {
+      "Type" : "String",
+      "Description" : "The name of the S3 bucket containing the lambda code files used for the integration. Note that the S3 key in the bucket should be named 'VERSION.cloudwatch2humio.zip'.",
+      "Default" : "humio-public-us-east-1"
     }
   },
   "Conditions" : {
@@ -132,7 +137,7 @@
         },
         {
           "Label" : { "default" : "Lambda Settings" },
-          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "CreateCloudTrailForAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
+          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "CreateCloudTrailForAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "S3BucketContainingLambdaCodeFiles", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
         },
         {
           "Label" : { "default" : "Other" },
@@ -241,7 +246,7 @@
       "Properties": {
         "ServiceToken": { "Fn::GetAtt" : [ "HumioCloudWatchCopyZipLambda", "Arn" ] },
         "DestBucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-        "SourceBucket" : "humio-public-us-east-1",
+        "SourceBucket" : { "Ref" : "S3BucketContainingLambdaCodeFiles" },
         "Prefix" : { "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ] }
       }
     },
