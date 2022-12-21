@@ -1,8 +1,16 @@
+# This file contains the inline code for the lambda named "HumioCloudWatchCopyZipLambda".
+
 import json
 import logging
+import os
 import threading
 import boto3
 import cfnresponse
+
+level = os.getenv("log_level", "INFO")
+logging.basicConfig(level=level)
+logger = logging.getLogger()
+logger.setLevel(level)
 
 
 def copy_objects(source_bucket, dest_bucket, prefix):
@@ -12,9 +20,9 @@ def copy_objects(source_bucket, dest_bucket, prefix):
         'Bucket': source_bucket,
         'Key': key
     }
-    print(('copy_source: %s' % copy_source))
-    print(('dest_bucket = %s'%dest_bucket))
-    print(('key = %s' %key))
+    logger.debug(('copy_source: %s' % copy_source))
+    logger.debug(('dest_bucket = %s'%dest_bucket))
+    logger.debug(('key = %s' %key))
     s3.copy_object(CopySource=copy_source, Bucket=dest_bucket, Key=key)
 
 
@@ -34,7 +42,7 @@ def handler(event, context):
     timer = threading.Timer((context.get_remaining_time_in_millis()
                              / 1000.00) - 0.5, timeout, args=[event, context])
     timer.start()
-    print(('Received event: %s' % json.dumps(event)))
+    logger.debug(('Received event: %s' % json.dumps(event)))
     status = cfnresponse.SUCCESS
     try:
         source_bucket = event['ResourceProperties']['SourceBucket']
