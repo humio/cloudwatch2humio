@@ -1,17 +1,26 @@
 # Changelog
 
 ## 1.3.0 (2022-12-22)
-Added functionality to choose which S3 bucket should be used for retrieving the code files for the AWS Lambda functions. 
+Added functionality to choose which S3 bucket should be used for retrieving the code files for the AWS Lambda functions and removed the option to choose older versions of the integration. 
 
 ### Added
 - Introduced parameter groups in the CF template.
+- Added parameter for setting the S3 bucket containing the Lambda code files.
+- Added parameter for setting the S3 key in the S3 bucket containing the Lambda code files.
 - Created resources for copying the Lambda code files from the specified S3 bucket, so that it is no longer required to create a new bucket in each region supported. The default S3 bucket hosted by Humio is named _humio-public-us-east-1_.
+- Added a parameter for determining whether the CloudTrail and S3 bucket for autosubscription should be created, which also made it possible to delete the additional CF template.
+- Added it possible for users to set which S3 bucket they want to retrieve the Lambda code files from, which also made it possible to delete the CF template for testing.
+
 
 ### Changed
 - Made metric ingester and metric statistics ingester creation optional.
-- Made a parameter for determining whether the CloudTrail and S3 bucket for autosubscription should be created, which also made it possible to delete the additional CF template.
-- Made it possible for users to set which S3 bucket they want to retrieve the Lambda code files from, which also made it possible to delete the CF template for testing.
 - Updated the README of the project to contain a section concerning how the integration works.
+- Updated the deployment scripts. 
+
+### Removed
+- Removed the CF template with no trail.
+- Removed the CF template for testing.
+- Removed the parameter related to versions, so that there is only the newest version of the code uploaded.
 
 ## 1.2.2 (2022-08-30)
 Added additional login at ingest error.
