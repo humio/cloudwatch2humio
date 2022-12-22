@@ -20,7 +20,7 @@
     },
     "HumioLambdaLogRetention" : {
       "Type" : "Number",
-      "Description" : "Number of days to retain CloudWatch logs from the Humio Lambda functions.",
+      "Description" : "The number of days to retain CloudWatch logs for the created Lambda functions.",
       "Default": 1
     },
     "EnableCloudWatchLogsAutoSubscription" : {
@@ -43,7 +43,7 @@
     },
     "HumioCloudWatchLogsSubscriptionPrefix" : {
       "Type" : "String",
-      "Description" : "Humio will only autosubscribe using either the backfiller or the autosubscriber to log groups with the prefix specified.",
+      "Description" : "Humio will only subscribe using either the backfiller or the autosubscriber to log groups with the prefix specified.",
       "Default" : ""
     },
     "EnableCloudWatchLogsBackfillerAutoRun" : {
@@ -61,7 +61,7 @@
         "true",
         "false"
       ],
-      "Description" : "Choose whether the metric ingester and the metric statistics ingester lambdas should be created. These are not necessary for getting CloudWatch logs into Humio. Set to 'true' to create.",
+      "Description" : "Choose whether the metric ingester and the metric statistics ingester Lambdas should be created. These are not necessary for getting CloudWatch logs into Humio. Set to 'true' to create.",
       "Default" : "false"
     },
     "EnableVPCForIngesterLambdas" : {
@@ -70,31 +70,32 @@
         "true",
         "false"
       ],
-      "Description" : "Use a VPC for the lambda ingester functions. Set to 'true' to enable.",
+      "Description" : "Use a VPC for the Lambda ingester functions. Set to 'true' to enable.",
       "Default" : "false"
     },
     "SecurityGroupIds" : {
       "Type" : "CommaDelimitedList",
-      "Description" : "A comma separated list of security group ids for the VPC configuration regarding the ingester lambda functions. Only required if VPC is enabled."
+      "Description" : "A comma separated list of security group ids for the VPC configuration regarding the ingester Lambda functions. Only required if VPC is enabled."
     },
     "SubnetIds" : {
       "Type" : "CommaDelimitedList",
-      "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lambda functions will be deployed into. Only required if VPC is enabled."
+      "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester Lambda functions will be deployed into. Only required if VPC is enabled."
     },
     "HumioLambdaLogLevel" : {
       "Type" : "String",
       "AllowedValues" : ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-      "Default" : "INFO"
-    },
-    "Version" : {
-      "Type" : "String",
-      "Description" : "The version of the integration you want installed.",
-      "Default" : "v1.3.0"
+      "Default" : "INFO",
+      "Description" : "The log level printed by the Lambda functions when they run. Note that a higher log level will result in more CloudWatch logs."
     },
     "S3BucketContainingLambdaCodeFiles" : {
       "Type" : "String",
-      "Description" : "The name of the S3 bucket containing the lambda code files used for the integration. Note that the S3 key in the bucket should be named 'VERSION.cloudwatch2humio.zip'.",
+      "Description" : "The name of the S3 bucket containing the Lambda code files used for the integration. Change this if you want to retrieve the code files from another S3 bucket than the default 'humio-public-us-east-1'.",
       "Default" : "humio-public-us-east-1"
+    },
+    "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" : {
+      "Type" : "String",
+      "Description" : "The name of the S3 key in the S3 bucket containing the Lambda code files used for the integration. Change this if you have named the deployment package containing the code files something other than the default 'cloudwatch2humio.zip'.",
+      "Default" : "cloudwatch2humio.zip"
     }
   },
   "Conditions" : {
@@ -137,11 +138,17 @@
         },
         {
           "Label" : { "default" : "Lambda Settings" },
-          "Parameters" : [ "EnableCloudWatchLogsAutoSubscription", "CreateCloudTrailForAutoSubscription", "EnableCloudWatchLogsBackfillerAutoRun", "HumioCloudWatchLogsSubscriptionPrefix", "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas", "S3BucketContainingLambdaCodeFiles", "HumioLambdaLogLevel", "HumioLambdaLogRetention" ]
-        },
-        {
-          "Label" : { "default" : "Other" },
-          "Parameters" : [ "Version" ]
+          "Parameters" : [
+            "EnableCloudWatchLogsAutoSubscription",
+            "CreateCloudTrailForAutoSubscription",
+            "EnableCloudWatchLogsBackfillerAutoRun",
+            "HumioCloudWatchLogsSubscriptionPrefix",
+            "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas",
+            "S3BucketContainingLambdaCodeFiles",
+            "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles",
+            "HumioLambdaLogLevel",
+            "HumioLambdaLogRetention"
+          ]
         }
       ]
     }
@@ -247,7 +254,7 @@
         "ServiceToken": { "Fn::GetAtt" : [ "HumioCloudWatchCopyZipLambda", "Arn" ] },
         "DestBucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
         "SourceBucket" : { "Ref" : "S3BucketContainingLambdaCodeFiles" },
-        "Prefix" : { "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ] }
+        "Prefix" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
       }
     },
     "HumioCloudWatchCopyZipLambda" : {
@@ -280,9 +287,7 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-          "S3Key" : {
-            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
-          }
+          "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
@@ -339,9 +344,7 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-          "S3Key" : {
-            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
-          }
+          "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
@@ -404,9 +407,7 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-          "S3Key" : {
-            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
-          }
+          "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
@@ -560,9 +561,7 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-          "S3Key" : {
-            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
-          }
+          "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
@@ -622,9 +621,7 @@
       "Properties" : {
         "Code" : {
           "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
-          "S3Key" : {
-            "Fn::Join" : [ "_", [ { "Ref" : "Version" }, "cloudwatch2humio.zip" ] ]
-          }
+          "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
