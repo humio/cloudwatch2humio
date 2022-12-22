@@ -1,4 +1,5 @@
 # This file contains the inline code for the lambda named "HumioCloudWatchCopyZipLambda".
+# This code is copied directly into the CF resource, and thus this file is only to have an overview.
 
 import json
 import logging
