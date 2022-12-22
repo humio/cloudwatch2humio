@@ -1,7 +1,15 @@
 # Changelog
 
+## 1.3.0 (2022-12-22)
+- Introduced parameter groups in the CF template.
+- Made metric ingester and metric statistics ingester creation optional.
+- Made a parameter for determining whether the CloudTrail and S3 bucket for autosubscription should be created, which also made it possible to delete the additional CF template.
+- Made it possible for users to set which S3 bucket they want to retrieve the Lambda code files from, which also made it possible to delete the CF template for testing.
+- Created resources for copying the Lambda code files from the specified S3 bucket, so that it is no longer required to create a new bucket in each region supported. The default S3 bucket hosted by Humio is named _humio-public-us-east-1_.
+- Updated the README of the project to contain a section concerning how the integration works.
+
 ## 1.2.2 (2022-08-30)
-Added additional login at ingest error
+- Added additional login at ingest error
 
 ### Added
 - Logging for when ingest into Humio fails
