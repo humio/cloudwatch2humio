@@ -14,22 +14,21 @@ logger = logging.getLogger()
 logger.setLevel(level)
 
 
-def copy_objects(source_bucket, dest_bucket, prefix):
+def copy_objects(source_bucket, dest_bucket, key):
     s3 = boto3.client('s3')
-    key = prefix
     copy_source = {
         'Bucket': source_bucket,
         'Key': key
     }
     logger.debug(('copy_source: %s' % copy_source))
-    logger.debug(('dest_bucket = %s'%dest_bucket))
-    logger.debug(('key = %s' %key))
+    logger.debug(('dest_bucket = %s' % dest_bucket))
+    logger.debug(('key = %s' % key))
     s3.copy_object(CopySource=copy_source, Bucket=dest_bucket, Key=key)
 
 
-def delete_objects(bucket, prefix):
+def delete_objects(bucket, key):
     s3 = boto3.client('s3')
-    s3.delete_objects(Bucket=bucket, Delete=prefix)
+    s3.delete_objects(Bucket=bucket, Delete=key)
 
 
 def timeout(event, context):
@@ -48,11 +47,11 @@ def handler(event, context):
     try:
         source_bucket = event['ResourceProperties']['SourceBucket']
         dest_bucket = event['ResourceProperties']['DestBucket']
-        prefix = event['ResourceProperties']['Prefix']
+        key = event['ResourceProperties']['Key']
         if event['RequestType'] == 'Delete':
-            delete_objects(dest_bucket, prefix)
+            delete_objects(dest_bucket, key)
         else:
-            copy_objects(source_bucket, dest_bucket, prefix)
+            copy_objects(source_bucket, dest_bucket, key)
     except Exception as e:
         logging.error('Exception: %s' % e, exc_info=True)
         status = cfnresponse.FAILED
