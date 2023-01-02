@@ -28,8 +28,8 @@ def lambda_handler(event, context):
     send_custom_resource_response(event, context)
 
     # Set environment variables.
-    humio_log_ingester_arn = os.environ["humio_log_ingester_arn"]
-    humio_subscription_prefix = os.environ.get("humio_subscription_prefix")
+    logscale_log_ingester_arn = os.environ["logscale_log_ingester_arn"]
+    logscale_subscription_prefix = os.environ.get("logscale_subscription_prefix")
 
     # Set up CloudWatch Logs client.
     log_client = boto3.client("logs")
@@ -37,9 +37,9 @@ def lambda_handler(event, context):
     # Grab all log groups with a token and/or prefix if we have them.
     if "nextToken" in event.keys():
         next_token = event["nextToken"]
-        if humio_subscription_prefix:
+        if logscale_subscription_prefix:
             log_groups = log_client.describe_log_groups(
-                logGroupNamePrefix=humio_subscription_prefix,
+                logGroupNamePrefix=logscale_subscription_prefix,
                 nextToken=next_token
             )
         else:
@@ -47,9 +47,9 @@ def lambda_handler(event, context):
                 nextToken=next_token
             )
     else:
-        if humio_subscription_prefix:
+        if logscale_subscription_prefix:
             log_groups = log_client.describe_log_groups(
-                logGroupNamePrefix=humio_subscription_prefix,
+                logGroupNamePrefix=logscale_subscription_prefix,
             )
         else:
             log_groups = log_client.describe_log_groups()
@@ -74,7 +74,8 @@ def lambda_handler(event, context):
         # First we check to see if there are any filters at all.
         if all_subscription_filters["subscriptionFilters"]:
             # If our function is not subscribed, delete subscription and create ours.
-            if all_subscription_filters["subscriptionFilters"][0]["destinationArn"] != humio_log_ingester_arn:
+            if all_subscription_filters["subscriptionFilters"][0]["destinationArn"] != logscale_log_ingester_arn:
+                # TODO: Do not delete subscriptions! It is better that it fails in this case instead of potentially ruining infrastructure.
                 helpers.delete_subscription(
                     log_client,
                     log_group["logGroupName"],
@@ -83,7 +84,7 @@ def lambda_handler(event, context):
                 helpers.create_subscription(
                     log_client,
                     log_group["logGroupName"],
-                    humio_log_ingester_arn,
+                    logscale_log_ingester_arn,
                     context
                 )
             # We are now subscribed.
@@ -94,19 +95,19 @@ def lambda_handler(event, context):
             helpers.create_subscription(
                 log_client,
                 log_group["logGroupName"],
-                humio_log_ingester_arn, context
+                logscale_log_ingester_arn, context
             )
 
 
 def send_custom_resource_response(event, context):
     if "LogicalResourceId" in event.keys():
-        if event["LogicalResourceId"] == "HumioBackfillerAutoRunner":
+        if event["LogicalResourceId"] == "LogScaleBackfillerAutoRunner":
             response_content = {
                 "Status" : "SUCCESS",
                 "RequestId" : event["RequestId"],
                 "LogicalResourceId" : event["LogicalResourceId"],
                 "StackId" : event["StackId"],
-                "PhysicalResourceId" : event["ResourceProperties"]["StackName"] + "-HumioBackfillerAutoRunner"
+                "PhysicalResourceId" : event["ResourceProperties"]["StackName"] + "-LogScaleBackfillerAutoRunner"
             }
             response = requests.put(
                 event["ResponseURL"],
