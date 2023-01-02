@@ -94,8 +94,8 @@
     },
     "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" : {
       "Type" : "String",
-      "Description" : "The name of the S3 key in the S3 bucket containing the Lambda code files used for the integration. Change this if you have named the deployment package containing the code files something other than the default 'cloudwatch2humio.zip'.",
-      "Default" : "cloudwatch2humio.zip"
+      "Description" : "The name of the S3 key in the S3 bucket containing the Lambda code files used for the integration. Change this if you have named the deployment package containing the code files something other than the default 'cloudwatch2logscale.zip'.",
+      "Default" : "cloudwatch2logscale.zip"
     }
   },
   "Conditions" : {

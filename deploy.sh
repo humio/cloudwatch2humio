@@ -23,3 +23,6 @@ aws s3 cp --acl public-read target/cloudwatch2humio.zip s3://humio-public-us-eas
 
 #aws s3 cp --acl public-read target/v1.2.2_cloudwatch2humio.zip s3://humio-public-ap-southeast-1/ --region ap-southeast-1
 #aws s3 cp --acl public-read target/v1.2.2_cloudwatch2humio.zip s3://humio-public-ap-southeast-2/ --region ap-southeast-2
+
+aws s3 cp --acl public-read cloudformation.json s3://logscale-public-us-east-1/ --region us-east-1
+aws s3 cp --acl public-read target/cloudwatch2logscale.zip s3://logscale-public-us-east-1/ --region us-east-1
