@@ -1,4 +1,4 @@
-# This file contains the inline code for the lambda named "HumioCloudWatchCopyZipLambda".
+# This file contains the inline code for the lambda named "LogScaleCloudWatchCopyZipLambda".
 # This code is copied directly into the CF resource, and thus this file is only to have an overview.
 # This code is based on the inline code from the following GitHub library https://github.com/aws-quickstart/quickstart-examples/blob/main/patterns/LambdaZips/example.yaml.
 
