@@ -21,29 +21,29 @@ def setup():
     This can be called every invocation but we will only run it once
     per Lambda instance.
     """
-    global humio_host
-    global humio_protocol
-    global humio_ingest_token
+    global logscale_host
+    global logscale_protocol
+    global logscale_ingest_token
     global http_session
     global _is_setup
 
     if _is_setup:
         return
 
-    humio_host = os.environ["humio_host"]
-    humio_protocol = os.environ["humio_protocol"]
-    humio_ingest_token = os.environ["humio_ingest_token"]
+    logscale_host = os.environ["logscale_host"]
+    logscale_protocol = os.environ["logscale_protocol"]
+    logscale_ingest_token = os.environ["logscale_ingest_token"]
     http_session = requests.Session()
 
     _is_setup = True
 
 
-def ingest_events(humio_events, host_type):
+def ingest_events(logscale_events, host_type):
     """
-    Wrap and send CloudWatch Logs/Metrics to Humio repository.
+    Wrap and send CloudWatch Logs/Metrics to LogScale repository.
 
-    :param humio_events: Structured events to be ingested into Humio.
-    :type humio_events: list
+    :param logscale_events: Structured events to be ingested into LogScale.
+    :type logscale_events: list
 
     :param host_type: Type of host from which the events are being sent.
     :type host_type: str
@@ -51,29 +51,29 @@ def ingest_events(humio_events, host_type):
     :return: Response object from request.
     :rtype: obj
     """
-    humio_url = "%s://%s/api/v1/ingest/humio-structured" % (humio_protocol, humio_host)
-    humio_headers = {
+    logscale_url = "%s://%s/api/v1/ingest/humio-structured" % (logscale_protocol, logscale_host)
+    logscale_headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer %s" % humio_ingest_token
+        "Authorization": "Bearer %s" % logscale_ingest_token
     }
 
-    # Prepare events to be sent to Humio.
-    wrapped_data = [{"tags": {"host": host_type}, "events": humio_events}]
+    # Prepare events to be sent to LogScale.
+    wrapped_data = [{"tags": {"host": host_type}, "events": logscale_events}]
 
-    logger.debug("Data being sent to Humio: %s" % wrapped_data)
+    logger.debug("Data being sent to LogScale: %s" % wrapped_data)
 
     # Make request. 
     response = http_session.post(
-        humio_url,
+        logscale_url,
         data=json.dumps(wrapped_data),
-        headers=humio_headers
+        headers=logscale_headers
     )
     try:
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
-        logger.error("Got error %s from Humio." % response.text, exc_info= e)
+        logger.error("Got error %s from LogScale." % response.text, exc_info= e)
     else:
-        logger.debug("Got response %s from Humio." % response.text)
+        logger.debug("Got response %s from LogScale." % response.text)
 
     return response
 
@@ -94,7 +94,7 @@ def decode_event(event):
     return decoded_event
 
 
-def create_subscription(log_client, log_group_name, humio_log_ingester_arn, context):
+def create_subscription(log_client, log_group_name, logscale_log_ingester_arn, context):
     """
     Create subscription to CloudWatch Logs specified log group.
 
@@ -104,8 +104,8 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
     :param log_group_name: Name of the log group.
     :type log_group_name: str
 
-    :param humio_log_ingester_arn: Name of the logs ingester resource.
-    :type humio_log_ingester_arn: str
+    :param logscale_log_ingester_arn: Name of the logs ingester resource.
+    :type logscale_log_ingester_arn: str
 
     :param context: Lambda context object.
     :type context: obj
@@ -115,17 +115,20 @@ def create_subscription(log_client, log_group_name, humio_log_ingester_arn, cont
     # We cannot subscribe to the log group that our stdout/err goes to.
     if context.log_group_name == log_group_name:
         logger.debug("Skipping our own log group name...")
-    # And we do not want to subscribe to other Humio log ingesters - if there are any. 
+    # And we do not want to subscribe to other LogScale log ingesters - if there are any.
     if "HumioCloudWatchLogsIngester" in log_group_name:
-        logger.debug("Skipping cloudwatch2humio ingesters...")
+        logger.debug("Skipping cloudwatch2logscale ingesters...")
+    # And we do not want to subscribe to other LogScale log ingesters - if there are any.
+    if "LogScaleCloudWatchLogsIngester" in log_group_name:
+        logger.debug("Skipping cloudwatch2logscale ingesters...")
     else:
         logger.info("Creating subscription for %s" % log_group_name)
         try:
             log_client.put_subscription_filter(
                 logGroupName=log_group_name,
-                filterName="%s-humio_ingester" % log_group_name,
+                filterName="%s-logscale_ingester" % log_group_name,
                 filterPattern="",  # Matching everything.
-                destinationArn=humio_log_ingester_arn,
+                destinationArn=logscale_log_ingester_arn,
                 distribution="ByLogStream"
             )
             logger.debug("Successfully subscribed to %s!" % log_group_name)
