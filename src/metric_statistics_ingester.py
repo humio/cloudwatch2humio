@@ -13,7 +13,7 @@ logger.setLevel(level)
 
 def lambda_handler(event, context):
     """
-    Ingest CloudWatch Metric statistics to Humio repository.
+    Ingest CloudWatch Metric statistics to LogScale repository.
 
     :param event: Event data.
     :type event: dict
@@ -34,11 +34,11 @@ def lambda_handler(event, context):
     # Used for debugging.
     logger.debug("Statistics from CloudWatch Metrics: %s" % metric_statistics)
 
-    # Format metric data to Humio event data.
-    humio_events = create_humio_events(metric_statistics, api_parameters)
+    # Format metric data to LogScale event data.
+    logscale_events = create_logscale_events(metric_statistics, api_parameters)
 
-    # Send Humio event data to Humio.
-    helpers.ingest_events(humio_events, "cloudwatch_metrics")
+    # Send LogScale event data to LogScale.
+    helpers.ingest_events(logscale_events, "cloudwatch_metrics")
 
 
 def get_metric_statistics(configurations):
@@ -77,9 +77,9 @@ def get_metric_statistics(configurations):
         return metric_statistics, api_parameters
 
 
-def create_humio_events(metrics, api_parameters):
+def create_logscale_events(metrics, api_parameters):
     """
-    Create list of Humio events based on metrics.
+    Create list of LogScale events based on metrics.
 
     :param metrics: Metrics received from GetMetricStatistics.
     :type metrics: dict
@@ -88,15 +88,15 @@ def create_humio_events(metrics, api_parameters):
     to retrieve the metric statistics.
     :type lambda_event: dict
 
-    :return: List of events to be sent to Humio.
+    :return: List of events to be sent to LogScale.
     :rtype: list
     """
-    humio_events = []
+    logscale_events = []
 
     # Used for debuggin.
     logger.debug("Datapoints: %s" % metrics["Datapoints"])
 
-    # Create one Humio event per datapoint/timestamp.
+    # Create one LogScale event per datapoint/timestamp.
     for datapoint in metrics["Datapoints"]:
         # Create event data.
         event = {
@@ -117,6 +117,6 @@ def create_humio_events(metrics, api_parameters):
                 "requestParameters ": api_parameters
             }
         }
-        humio_events.append(event)
+        logscale_events.append(event)
 
-    return humio_events
+    return logscale_events
