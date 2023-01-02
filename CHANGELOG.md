@@ -1,7 +1,10 @@
 # Changelog
 
 ## 1.3.0 (2022-12-22)
-Added functionality to choose which S3 bucket should be used for retrieving the code files for the AWS Lambda functions and removed the option to choose older versions of the integration. 
+Added functionality to choose which S3 bucket should be used for retrieving the code files for the AWS Lambda functions, 
+removed the option to choose older versions of the integration,
+and replaced the name Humio with LogScale where possible.
+
 
 ### Added
 - Introduced parameter groups in the CF template.
@@ -16,6 +19,7 @@ Added functionality to choose which S3 bucket should be used for retrieving the 
 - Made metric ingester and metric statistics ingester creation optional.
 - Updated the README of the project to contain a section concerning how the integration works.
 - Updated the deployment scripts. 
+- Replaced 'Humio' with 'LogScale' where possible. 
 
 ### Removed
 - Removed the CF template with no trail.
