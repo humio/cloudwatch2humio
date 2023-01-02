@@ -1,24 +1,24 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
-  "Description" : "CloudWatch to Humio Integration for sending CloudWatch Logs and Metrics to Humio.",
+  "Description" : "CloudWatch to LogScale Integration for sending CloudWatch Logs and Metrics to LogScale.",
   "Parameters" : {
-    "HumioProtocol" : {
+    "LogScaleProtocol" : {
       "Type" : "String",
-      "Description" : "The transport protocol used for delivering log/metric events to Humio. HTTPS is default and recommended.",
+      "Description" : "The transport protocol used for delivering log/metric events to LogScale. HTTPS is default and recommended.",
       "Default" : "https"
     },
-    "HumioHost" : {
+    "LogScaleHost" : {
       "Type" : "String",
-      "Description" : "The host to ship Humio log/metric events to.",
+      "Description" : "The host to ship LogScale log/metric events to.",
       "Default" : "cloud.humio.com"
     },
-    "HumioIngestToken" : {
+    "LogScaleIngestToken" : {
       "Type" : "String",
-      "Description" : "The value of the ingest token for the repository from your Humio account to ship log/metric events to.",
+      "Description" : "The value of the ingest token for the repository from your LogScale account to ship log/metric events to.",
       "Default" : "",
       "NoEcho" : true
     },
-    "HumioLambdaLogRetention" : {
+    "LogScaleLambdaLogRetention" : {
       "Type" : "Number",
       "Description" : "The number of days to retain CloudWatch logs for the created Lambda functions.",
       "Default": 1
@@ -41,9 +41,9 @@
       "Description" : "If autosubscription to new logs is desired, but instead of the needed resources (a CloudTrail and a S3 bucket) being created now existing resources can be used instead. To use existing resources set this to 'false'. Note that this parameter is only considered if autosubscription is enabled.",
       "Default" : "true"
     },
-    "HumioCloudWatchLogsSubscriptionPrefix" : {
+    "LogScaleCloudWatchLogsSubscriptionPrefix" : {
       "Type" : "String",
-      "Description" : "Humio will only subscribe using either the backfiller or the autosubscriber to log groups with the prefix specified.",
+      "Description" : "LogScale will only subscribe using either the backfiller or the autosubscriber to log groups with the prefix specified.",
       "Default" : ""
     },
     "EnableCloudWatchLogsBackfillerAutoRun" : {
@@ -61,7 +61,7 @@
         "true",
         "false"
       ],
-      "Description" : "Choose whether the metric ingester and the metric statistics ingester Lambdas should be created. These are not necessary for getting CloudWatch logs into Humio. Set to 'true' to create.",
+      "Description" : "Choose whether the metric ingester and the metric statistics ingester Lambdas should be created. These are not necessary for getting CloudWatch logs into LogScale. Set to 'true' to create.",
       "Default" : "false"
     },
     "EnableVPCForIngesterLambdas" : {
@@ -81,7 +81,7 @@
       "Type" : "CommaDelimitedList",
       "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester Lambda functions will be deployed into. Only required if VPC is enabled."
     },
-    "HumioLambdaLogLevel" : {
+    "LogScaleLambdaLogLevel" : {
       "Type" : "String",
       "AllowedValues" : ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
       "Default" : "INFO",
@@ -115,7 +115,7 @@
         }
       ]
     },
-    "CreateHumioBackfillerAutoRunner" : {
+    "CreateLogScaleBackfillerAutoRunner" : {
       "Fn::Equals" : [ { "Ref" : "EnableCloudWatchLogsBackfillerAutoRun" }, "true" ]
     },
     "ConfigureVPCForIngesterLambdas" : {
@@ -129,8 +129,8 @@
     "AWS::CloudFormation::Interface" : {
       "ParameterGroups" : [
         {
-          "Label" : { "default" : "Humio Settings" },
-          "Parameters" : [ "HumioProtocol", "HumioHost", "HumioIngestToken" ]
+          "Label" : { "default" : "LogScale Settings" },
+          "Parameters" : [ "LogScaleProtocol", "LogScaleHost", "LogScaleIngestToken" ]
         },
         {
           "Label" : { "default" : "VPC Settings"},
@@ -142,19 +142,19 @@
             "EnableCloudWatchLogsAutoSubscription",
             "CreateCloudTrailForAutoSubscription",
             "EnableCloudWatchLogsBackfillerAutoRun",
-            "HumioCloudWatchLogsSubscriptionPrefix",
+            "LogScaleCloudWatchLogsSubscriptionPrefix",
             "CreateCloudWatchMetricIngesterAndMetricStatisticsIngesterLambdas",
             "S3BucketContainingLambdaCodeFiles",
             "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles",
-            "HumioLambdaLogLevel",
-            "HumioLambdaLogRetention"
+            "LogScaleLambdaLogLevel",
+            "LogScaleLambdaLogRetention"
           ]
         }
       ]
     }
   },
   "Resources" : {
-    "HumioCloudWatchRole" : {
+    "LogScaleCloudWatchRole" : {
       "Type" : "AWS::IAM::Role",
       "Properties" : {
         "AssumeRolePolicyDocument" : {
@@ -176,7 +176,7 @@
         },
         "Policies" : [
           {
-            "PolicyName" : "humio_cloudwatch_role",
+            "PolicyName" : "logscale_cloudwatch_role",
             "PolicyDocument" : {
               "Fn::If" : [ "ConfigureVPCForIngesterLambdas",
                 {
@@ -245,56 +245,56 @@
         ]
       }
     },
-    "HumioCloudWatchLambdaZipBucket" : {
+    "LogScaleCloudWatchLambdaZipBucket" : {
       "Type" : "AWS::S3::Bucket"
     },
-    "HumioCloudWatchCopyZipCustom" : {
+    "LogScaleCloudWatchCopyZipCustom" : {
       "Type" : "Custom::CopyZip",
       "Properties": {
-        "ServiceToken": { "Fn::GetAtt" : [ "HumioCloudWatchCopyZipLambda", "Arn" ] },
-        "DestBucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+        "ServiceToken": { "Fn::GetAtt" : [ "LogScaleCloudWatchCopyZipLambda", "Arn" ] },
+        "DestBucket" : { "Ref" : "LogScaleCloudWatchLambdaZipBucket" },
         "SourceBucket" : { "Ref" : "S3BucketContainingLambdaCodeFiles" },
         "Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
       }
     },
-    "HumioCloudWatchCopyZipLambda" : {
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+    "LogScaleCloudWatchCopyZipLambda" : {
+      "DependsOn" : [ "LogScaleCloudWatchRole" ],
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Description" : "Copies objects from a S3 bucket to a destination.",
         "Handler" : "index.handler",
         "Runtime" : "python3.8",
         "Timeout" : "300",
-        "Role" : { "Fn::GetAtt": [ "HumioCloudWatchRole", "Arn" ] },
+        "Role" : { "Fn::GetAtt": [ "LogScaleCloudWatchRole", "Arn" ] },
         "Code" : {
           "ZipFile" : "import json\nimport logging\nimport os\nimport threading\nimport boto3\nimport cfnresponse\n\nlevel = os.getenv(\"log_level\", \"INFO\")\nlogging.basicConfig(level=level)\nlogger = logging.getLogger()\nlogger.setLevel(level)\n\n\ndef copy_objects(source_bucket, dest_bucket, key):\n    s3 = boto3.client('s3')\n    copy_source = {\n        'Bucket': source_bucket,\n        'Key': key\n    }\n    logger.debug(('copy_source: %s' % copy_source))\n    logger.debug(('dest_bucket = %s' % dest_bucket))\n    logger.debug(('key = %s' % key))\n    s3.copy_object(CopySource=copy_source, Bucket=dest_bucket, Key=key)\n\n\ndef delete_objects(bucket, key):\n    s3 = boto3.client('s3')\n    s3.delete_objects(Bucket=bucket, Delete=key)\n\n\ndef timeout(event, context):\n    logging.error('Execution is about to time out, sending failure response to CloudFormation')\n    cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)\n\n\ndef handler(event, context):\n    # make sure we send a failure to CloudFormation if the function\n    # is going to timeout\n    timer = threading.Timer((context.get_remaining_time_in_millis()\n                             / 1000.00) - 0.5, timeout, args=[event, context])\n    timer.start()\n    logger.debug(('Received event: %s' % json.dumps(event)))\n    status = cfnresponse.SUCCESS\n    try:\n        source_bucket = event['ResourceProperties']['SourceBucket']\n        dest_bucket = event['ResourceProperties']['DestBucket']\n        key = event['ResourceProperties']['Key']\n        if event['RequestType'] == 'Delete':\n            delete_objects(dest_bucket, key)\n        else:\n            copy_objects(source_bucket, dest_bucket, key)\n    except Exception as e:\n        logging.error('Exception: %s' % e, exc_info=True)\n        status = cfnresponse.FAILED\n    finally:\n        timer.cancel()\n        cfnresponse.send(event, context, status, {}, None)"
         }
       }
     },
-    "HumioCloudWatchCopyZipLambdaLogGroup" : {
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+    "LogScaleCloudWatchCopyZipLambdaLogGroup" : {
+      "DependsOn" : [ "LogScaleCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
         "LogGroupName" : {
-          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchCopyZipLambda" } ] ]
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "LogScaleCloudWatchCopyZipLambda" } ] ]
         },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        "RetentionInDays" : { "Ref" : "LogScaleLambdaLogRetention" }
       }
     },
-    "HumioCloudWatchLogsIngester" : {
-      "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
+    "LogScaleCloudWatchLogsIngester" : {
+      "DependsOn" : [ "LogScaleCloudWatchRole", "LogScaleCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+          "S3Bucket" : { "Ref" : "LogScaleCloudWatchLambdaZipBucket" },
           "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
-            "humio_protocol" : { "Ref" : "HumioProtocol" },
-            "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
-            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
+            "logscale_protocol" : { "Ref" : "LogScaleProtocol" },
+            "logscale_host" : { "Ref" : "LogScaleHost" },
+            "logscale_ingest_token" : { "Ref" : "LogScaleIngestToken" },
+            "log_level" : { "Ref" : "LogScaleLambdaLogLevel" }
           }
         },
         "VpcConfig" : {
@@ -308,174 +308,174 @@
             }
           ]
         },
-        "Description" : "CloudWatch Logs to Humio ingester.",
+        "Description" : "CloudWatch Logs to LogScale ingester.",
         "Handler" : "logs_ingester.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchRole", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
         "Runtime" : "python3.8",
         "Timeout" : "300"
       }
     },
-    "HumioCloudWatchLogsIngesterPermission" : {
+    "LogScaleCloudWatchLogsIngesterPermission" : {
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
         "FunctionName" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchLogsIngester", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchLogsIngester", "Arn" ]
         },
         "Principal" : "logs.amazonaws.com"
       }
     },
-    "HumioCloudWatchLogsIngesterLogGroup" : {
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+    "LogScaleCloudWatchLogsIngesterLogGroup" : {
+      "DependsOn" : [ "LogScaleCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
         "LogGroupName" : {
-          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchLogsIngester" } ] ]
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "LogScaleCloudWatchLogsIngester" } ] ]
         },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        "RetentionInDays" : { "Ref" : "LogScaleLambdaLogRetention" }
       }
     },
-    "HumioCloudWatchLogsSubscriber" : {
-      "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
+    "LogScaleCloudWatchLogsSubscriber" : {
+      "DependsOn" : [ "LogScaleCloudWatchRole", "LogScaleCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+          "S3Bucket" : { "Ref" : "LogScaleCloudWatchLambdaZipBucket" },
           "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
-            "humio_log_ingester_arn" : {
-              "Fn::GetAtt" : [ "HumioCloudWatchLogsIngester", "Arn" ]
+            "logscale_log_ingester_arn" : {
+              "Fn::GetAtt" : [ "LogScaleCloudWatchLogsIngester", "Arn" ]
             },
-            "humio_subscription_prefix" : { "Ref" : "HumioCloudWatchLogsSubscriptionPrefix" },
-            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
+            "logscale_subscription_prefix" : { "Ref" : "LogScaleCloudWatchLogsSubscriptionPrefix" },
+            "log_level" : { "Ref" : "LogScaleLambdaLogLevel" }
           }
         },
-        "Description" : "CloudWatch Logs to Humio log group subscriber.",
+        "Description" : "CloudWatch Logs to LogScale log group subscriber.",
         "Handler" : "logs_subscriber.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchRole", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
         "Runtime" : "python3.8",
         "Timeout" : "300"
       }
     },
-    "HumioCloudWatchLogsSubscriberPermission" : {
+    "LogScaleCloudWatchLogsSubscriberPermission" : {
       "Condition" : "CreateAutoSubscriptionResources",
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
         "FunctionName" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchLogsSubscriber", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriber", "Arn" ]
         },
         "Principal" : "events.amazonaws.com",
         "SourceAccount" : { "Ref" : "AWS::AccountId" }
       }
     },
-    "HumioCloudWatchLogsSubscriberPermission2" : {
+    "LogScaleCloudWatchLogsSubscriberPermission2" : {
       "Condition" : "CreateAutoSubscriptionResources",
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
         "FunctionName" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchLogsSubscriber", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriber", "Arn" ]
         },
         "Principal" : "events.amazonaws.com",
         "SourceArn" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchLogsSubscriberEventRule", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriberEventRule", "Arn" ]
         }
       }
     },
-    "HumioCloudWatchLogsSubscriberLogGroup" : {
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+    "LogScaleCloudWatchLogsSubscriberLogGroup" : {
+      "DependsOn" : [ "LogScaleCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
         "LogGroupName" : {
-          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchLogsSubscriber" } ] ]
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "LogScaleCloudWatchLogsSubscriber" } ] ]
         },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        "RetentionInDays" : { "Ref" : "LogScaleLambdaLogRetention" }
       }
     },
-    "HumioCloudWatchLogsBackfiller" : {
-      "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
+    "LogScaleCloudWatchLogsBackfiller" : {
+      "DependsOn" : [ "LogScaleCloudWatchRole", "LogScaleCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+          "S3Bucket" : { "Ref" : "LogScaleCloudWatchLambdaZipBucket" },
           "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
-            "humio_log_ingester_arn" : {
-              "Fn::GetAtt" : [ "HumioCloudWatchLogsIngester", "Arn" ]
+            "logscale_log_ingester_arn" : {
+              "Fn::GetAtt" : [ "LogScaleCloudWatchLogsIngester", "Arn" ]
             },
-            "humio_subscription_prefix" : { "Ref" : "HumioCloudWatchLogsSubscriptionPrefix" },
-            "humio_protocol" : { "Ref" : "HumioProtocol" },
-            "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
-            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
+            "logscale_subscription_prefix" : { "Ref" : "LogScaleCloudWatchLogsSubscriptionPrefix" },
+            "logscale_protocol" : { "Ref" : "LogScaleProtocol" },
+            "logscale_host" : { "Ref" : "LogScaleHost" },
+            "logscale_ingest_token" : { "Ref" : "LogScaleIngestToken" },
+            "log_level" : { "Ref" : "LogScaleLambdaLogLevel" }
           }
         },
-        "Description" : "CloudWatch Logs to Humio logs backfiller.",
+        "Description" : "CloudWatch Logs to LogScale logs backfiller.",
         "Handler" : "logs_backfiller.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchRole", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
         "Runtime" : "python3.8",
         "Timeout" : "300"
       }
     },
-    "HumioCloudWatchLogsBackfillerPermission" : {
+    "LogScaleCloudWatchLogsBackfillerPermission" : {
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
         "FunctionName" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchLogsBackfiller", "Arn" ]
         },
         "Principal" : "logs.amazonaws.com"
       }
     },
-    "HumioCloudWatchLogsBackfillerLogGroup" : {
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+    "LogScaleCloudWatchLogsBackfillerLogGroup" : {
+      "DependsOn" : [ "LogScaleCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
         "LogGroupName" : {
-          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchLogsBackfiller" } ] ]
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "LogScaleCloudWatchLogsBackfiller" } ] ]
         },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        "RetentionInDays" : { "Ref" : "LogScaleLambdaLogRetention" }
       }
     },
-    "HumioBackfillerAutoRunner" : {
-      "Condition" : "CreateHumioBackfillerAutoRunner",
-      "DependsOn" : [ "HumioCloudWatchLogsBackfiller" ],
+    "LogScaleBackfillerAutoRunner" : {
+      "Condition" : "CreateLogScaleBackfillerAutoRunner",
+      "DependsOn" : [ "LogScaleCloudWatchLogsBackfiller" ],
       "Type" : "Custom::BackfillerAutoRunner",
       "Properties" : {
-        "ServiceToken" : { "Fn::GetAtt" : [ "HumioCloudWatchLogsBackfiller", "Arn" ] },
+        "ServiceToken" : { "Fn::GetAtt" : [ "LogScaleCloudWatchLogsBackfiller", "Arn" ] },
         "StackName" : { "Ref" : "AWS::StackName" }
       }
     },
-    "HumioCloudWatchLogsSubscriberS3Bucket" : {
+    "LogScaleCloudWatchLogsSubscriberS3Bucket" : {
       "Condition" : "CreateCloudTrailAndS3BucketAndEnableAutoSubscription",
       "Type" : "AWS::S3::Bucket",
       "Properties" : {
         "AccessControl" : "BucketOwnerFullControl",
         "BucketName" : {
-          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio", "cloudtrail" ] ]
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "logscale", "cloudtrail" ] ]
         }
       }
     },
-    "HumioCloudWatchLogsSubscriberS3BucketPolicy" : {
+    "LogScaleCloudWatchLogsSubscriberS3BucketPolicy" : {
       "Condition" : "CreateCloudTrailAndS3BucketAndEnableAutoSubscription",
-      "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3Bucket" ],
+      "DependsOn" : [ "LogScaleCloudWatchLogsSubscriberS3Bucket" ],
       "Type" : "AWS::S3::BucketPolicy",
       "Properties" : {
-        "Bucket" : { "Ref" : "HumioCloudWatchLogsSubscriberS3Bucket" },
+        "Bucket" : { "Ref" : "LogScaleCloudWatchLogsSubscriberS3Bucket" },
         "PolicyDocument" : {
           "Version" : "2012-10-17",
           "Statement" : [
@@ -487,7 +487,7 @@
               },
               "Action" : "s3:GetBucketAcl",
               "Resource" : {
-                "Fn::GetAtt" : [ "HumioCloudWatchLogsSubscriberS3Bucket", "Arn" ]
+                "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriberS3Bucket", "Arn" ]
               }
             },
             {
@@ -498,7 +498,7 @@
               },
               "Action" : "s3:PutObject",
               "Resource" : {
-                "Fn::Join" : [ "", [ { "Fn::GetAtt" : [ "HumioCloudWatchLogsSubscriberS3Bucket", "Arn" ] }, "/AWSLogs/", { "Ref" : "AWS::AccountId" }, "/*" ] ]
+                "Fn::Join" : [ "", [ { "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriberS3Bucket", "Arn" ] }, "/AWSLogs/", { "Ref" : "AWS::AccountId" }, "/*" ] ]
               },
               "Condition" : {
                 "StringEquals" : { "s3:x-amz-acl" : "bucket-owner-full-control" }
@@ -508,9 +508,9 @@
         }
       }
     },
-    "HumioCloudWatchLogsSubscriberCloudTrail" : {
+    "LogScaleCloudWatchLogsSubscriberCloudTrail" : {
       "Condition" : "CreateCloudTrailAndS3BucketAndEnableAutoSubscription",
-      "DependsOn" : [ "HumioCloudWatchLogsSubscriberS3BucketPolicy" ],
+      "DependsOn" : [ "LogScaleCloudWatchLogsSubscriberS3BucketPolicy" ],
       "Type" : "AWS::CloudTrail::Trail",
       "Properties" : {
         "EnableLogFileValidation" : false,
@@ -518,19 +518,19 @@
         "IsMultiRegionTrail" : true,
         "IsLogging" : true,
         "S3BucketName" : {
-          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio", "cloudtrail" ] ]
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "logscale", "cloudtrail" ] ]
         },
         "TrailName" : {
-          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio", { "Ref" : "AWS::AccountId" } ] ]
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "logscale", { "Ref" : "AWS::AccountId" } ] ]
         }
       }
     },
-    "HumioCloudWatchLogsSubscriberEventRule" : {
+    "LogScaleCloudWatchLogsSubscriberEventRule" : {
       "Condition" : "CreateAutoSubscriptionResources",
-      "DependsOn" : [ "HumioCloudWatchLogsSubscriber" ],
+      "DependsOn" : [ "LogScaleCloudWatchLogsSubscriber" ],
       "Type" : "AWS::Events::Rule",
       "Properties" : {
-        "Description" : "Humio log group auto subscription event rule.",
+        "Description" : "LogScale log group auto subscription event rule.",
         "EventPattern" : {
           "source" : [ "aws.logs" ],
           "detail-type" : [ "AWS API Call via CloudTrail" ],
@@ -540,35 +540,35 @@
           }
         },
         "Name" : {
-          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio-auto-subscription-rule" ] ]
+          "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "logscale-auto-subscription-rule" ] ]
         },
         "Targets" : [
           {
             "Id" : {
-              "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "humio-auto-subscription-rule" ] ]
+              "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "logscale-auto-subscription-rule" ] ]
             },
             "Arn" : {
-              "Fn::GetAtt" : [ "HumioCloudWatchLogsSubscriber", "Arn" ]
+              "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriber", "Arn" ]
             }
           }
         ]
       }
     },
-    "HumioCloudWatchMetricIngester" : {
+    "LogScaleCloudWatchMetricIngester" : {
       "Condition" : "CreateMetricAndMetricStatisticsLambdas",
-      "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
+      "DependsOn" : [ "LogScaleCloudWatchRole", "LogScaleCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+          "S3Bucket" : { "Ref" : "LogScaleCloudWatchLambdaZipBucket" },
           "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
-            "humio_protocol" : { "Ref" : "HumioProtocol" },
-            "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
-            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
+            "logscale_protocol" : { "Ref" : "LogScaleProtocol" },
+            "logscale_host" : { "Ref" : "LogScaleHost" },
+            "logscale_ingest_token" : { "Ref" : "LogScaleIngestToken" },
+            "log_level" : { "Ref" : "LogScaleLambdaLogLevel" }
           }
         },
         "VpcConfig" : {
@@ -582,53 +582,53 @@
             }
           ]
         },
-        "Description" : "CloudWatch Metrics to Humio ingester.",
+        "Description" : "CloudWatch Metrics to LogScale ingester.",
         "Handler" : "metric_ingester.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchRole", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
         "Runtime" : "python3.8",
         "Timeout" : "300"
       }
     },
-    "HumioCloudWatchMetricIngesterPermission" : {
+    "LogScaleCloudWatchMetricIngesterPermission" : {
       "Condition" : "CreateMetricAndMetricStatisticsLambdas",
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
         "FunctionName" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchMetricIngester", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchMetricIngester", "Arn" ]
         },
         "Principal" : "logs.amazonaws.com"
       }
     },
-    "HumioCloudWatchMetricIngesterLogGroup" : {
+    "LogScaleCloudWatchMetricIngesterLogGroup" : {
       "Condition" : "CreateMetricAndMetricStatisticsLambdas",
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "DependsOn" : [ "LogScaleCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
         "LogGroupName" : {
-          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchMetricIngester" } ] ]
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "LogScaleCloudWatchMetricIngester" } ] ]
         },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        "RetentionInDays" : { "Ref" : "LogScaleLambdaLogRetention" }
       }
     },
-    "HumioCloudWatchMetricStatisticsIngester" : {
+    "LogScaleCloudWatchMetricStatisticsIngester" : {
       "Condition" : "CreateMetricAndMetricStatisticsLambdas",
-      "DependsOn" : [ "HumioCloudWatchRole", "HumioCloudWatchCopyZipCustom" ],
+      "DependsOn" : [ "LogScaleCloudWatchRole", "LogScaleCloudWatchCopyZipCustom" ],
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          "S3Bucket" : { "Ref" : "HumioCloudWatchLambdaZipBucket" },
+          "S3Bucket" : { "Ref" : "LogScaleCloudWatchLambdaZipBucket" },
           "S3Key" : { "Ref" : "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" }
         },
         "Environment" : {
           "Variables" : {
-            "humio_protocol" : { "Ref" : "HumioProtocol" },
-            "humio_host" : { "Ref" : "HumioHost" },
-            "humio_ingest_token" : { "Ref" : "HumioIngestToken" },
-            "log_level" : { "Ref" : "HumioLambdaLogLevel" }
+            "logscale_protocol" : { "Ref" : "LogScaleProtocol" },
+            "logscale_host" : { "Ref" : "LogScaleHost" },
+            "logscale_ingest_token" : { "Ref" : "LogScaleIngestToken" },
+            "log_level" : { "Ref" : "LogScaleLambdaLogLevel" }
           }
         },
         "VpcConfig" : {
@@ -642,36 +642,36 @@
             }
           ]
         },
-        "Description" : "CloudWatch Metrics Statistics to Humio ingester.",
+        "Description" : "CloudWatch Metrics Statistics to LogScale ingester.",
         "Handler" : "metric_statistics_ingester.lambda_handler",
         "MemorySize" : "128",
         "Role" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchRole", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
         "Runtime" : "python3.8",
         "Timeout" : "300"
       }
     },
-    "HumioCloudWatchMetricStatisticsIngesterPermission" : {
+    "LogScaleCloudWatchMetricStatisticsIngesterPermission" : {
       "Condition" : "CreateMetricAndMetricStatisticsLambdas",
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
         "FunctionName" : {
-          "Fn::GetAtt" : [ "HumioCloudWatchMetricStatisticsIngester", "Arn" ]
+          "Fn::GetAtt" : [ "LogScaleCloudWatchMetricStatisticsIngester", "Arn" ]
         },
         "Principal" : "logs.amazonaws.com"
       }
     },
-    "HumioCloudWatchMetricStatisticsIngesterLogGroup" : {
+    "LogScaleCloudWatchMetricStatisticsIngesterLogGroup" : {
       "Condition" : "CreateMetricAndMetricStatisticsLambdas",
-      "DependsOn" : [ "HumioCloudWatchRole" ],
+      "DependsOn" : [ "LogScaleCloudWatchRole" ],
       "Type" : "AWS::Logs::LogGroup",
       "Properties" : {
         "LogGroupName" : {
-          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "HumioCloudWatchMetricStatisticsIngester" } ] ]
+          "Fn::Join" : [ "", [ "/aws/lambda/", { "Ref" : "LogScaleCloudWatchMetricStatisticsIngester" } ] ]
         },
-        "RetentionInDays" : { "Ref" : "HumioLambdaLogRetention" }
+        "RetentionInDays" : { "Ref" : "LogScaleLambdaLogRetention" }
       }
     }
   }
