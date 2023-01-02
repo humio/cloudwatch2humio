@@ -16,6 +16,14 @@ logger.setLevel(level)
 
 
 def copy_objects(source_bucket, dest_bucket, key):
+    """
+    Copy ZIP file from source bucket to destination bucket.
+
+    :param source_bucket: S3 bucket containing ZIP file with code.
+    :param dest_bucket: S3 bucket where ZIP file with code should be copied to.
+    :param key: File name of the ZIP file with code.
+    :return: None
+    """
     s3 = boto3.client('s3')
     copy_source = {
         'Bucket': source_bucket,
@@ -28,18 +36,40 @@ def copy_objects(source_bucket, dest_bucket, key):
 
 
 def delete_objects(bucket, key):
+    """
+    Delete a bucket.
+
+    :param bucket: S3 bucket to be deleted.
+    :param key: S3 key to object that should be deleted.
+    :return:
+    """
     s3 = boto3.client('s3')
     s3.delete_objects(Bucket=bucket, Delete=key)
 
 
 def timeout(event, context):
+    """
+    Send a response to the custom resource if it times out.
+
+    :param event: Event data from the Lambda.
+    :param context: Lambda context object.
+    :return: None
+    """
     logging.error('Execution is about to time out, sending failure response to CloudFormation')
     cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)
 
 
 def handler(event, context):
-    # make sure we send a failure to CloudFormation if the function
-    # is going to timeout
+    """
+    Lambda handler that will copy the ZIP file from the source bucket to the
+    destination bucket.
+
+    It will send a failure to CloudFormation if the function is going to timeout.
+
+    :param event: Event data from caller.
+    :param context: Lambda context object.
+    :return:  None
+    """
     timer = threading.Timer((context.get_remaining_time_in_millis()
                              / 1000.00) - 0.5, timeout, args=[event, context])
     timer.start()
