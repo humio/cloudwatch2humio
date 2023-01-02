@@ -89,8 +89,8 @@
     },
     "S3BucketContainingLambdaCodeFiles" : {
       "Type" : "String",
-      "Description" : "The name of the S3 bucket containing the Lambda code files used for the integration. Change this if you want to retrieve the code files from another S3 bucket than the default 'humio-public-us-east-1'.",
-      "Default" : "humio-public-us-east-1"
+      "Description" : "The name of the S3 bucket containing the Lambda code files used for the integration. Change this if you want to retrieve the code files from another S3 bucket than the default 'logscale-public-us-east-1'.",
+      "Default" : "logscale-public-us-east-1"
     },
     "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" : {
       "Type" : "String",
