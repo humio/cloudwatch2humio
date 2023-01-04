@@ -17,11 +17,11 @@ logger.setLevel(level)
 
 def copy_objects(source_bucket, dest_bucket, key):
     """
-    Copy ZIP file from source bucket to destination bucket.
+    Copy key from source bucket to destination bucket.
 
     :param source_bucket: S3 bucket containing ZIP file with code.
     :param dest_bucket: S3 bucket where ZIP file with code should be copied to.
-    :param key: File name of the ZIP file with code.
+    :param key: File name to be copied.
     :return: None
     """
     s3 = boto3.client('s3')
@@ -37,14 +37,15 @@ def copy_objects(source_bucket, dest_bucket, key):
 
 def delete_objects(bucket, key):
     """
-    Delete a bucket.
+    Delete a bucket specified by the key.
 
     :param bucket: S3 bucket to be deleted.
     :param key: S3 key to object that should be deleted.
     :return:
     """
     s3 = boto3.client('s3')
-    s3.delete_objects(Bucket=bucket, Delete=key)
+    objects = {'Objects': [{'Key': key}]}
+    s3.delete_objects(Bucket=bucket, Delete=objects)
 
 
 def timeout(event, context):
