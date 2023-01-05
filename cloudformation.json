@@ -370,25 +370,10 @@
       "Type" : "AWS::Lambda::Permission",
       "Properties" : {
         "Action" : "lambda:InvokeFunction",
-        "FunctionName" : {
-          "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriber", "Arn" ]
-        },
+        "FunctionName" : { "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriber", "Arn" ] },
         "Principal" : "events.amazonaws.com",
-        "SourceAccount" : { "Ref" : "AWS::AccountId" }
-      }
-    },
-    "LogScaleCloudWatchLogsSubscriberPermission2" : {
-      "Condition" : "CreateAutoSubscriptionResources",
-      "Type" : "AWS::Lambda::Permission",
-      "Properties" : {
-        "Action" : "lambda:InvokeFunction",
-        "FunctionName" : {
-          "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriber", "Arn" ]
-        },
-        "Principal" : "events.amazonaws.com",
-        "SourceArn" : {
-          "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriberEventRule", "Arn" ]
-        }
+        "SourceAccount" : { "Ref" : "AWS::AccountId" },
+        "SourceArn" : { "Fn::GetAtt" : [ "LogScaleCloudWatchLogsSubscriberEventRule", "Arn" ] }
       }
     },
     "LogScaleCloudWatchLogsSubscriberLogGroup" : {
@@ -429,16 +414,6 @@
         },
         "Runtime" : "python3.8",
         "Timeout" : "300"
-      }
-    },
-    "LogScaleCloudWatchLogsBackfillerPermission" : {
-      "Type" : "AWS::Lambda::Permission",
-      "Properties" : {
-        "Action" : "lambda:InvokeFunction",
-        "FunctionName" : {
-          "Fn::GetAtt" : [ "LogScaleCloudWatchLogsBackfiller", "Arn" ]
-        },
-        "Principal" : "logs.amazonaws.com"
       }
     },
     "LogScaleCloudWatchLogsBackfillerLogGroup" : {
@@ -592,17 +567,6 @@
         "Timeout" : "300"
       }
     },
-    "LogScaleCloudWatchMetricIngesterPermission" : {
-      "Condition" : "CreateMetricAndMetricStatisticsLambdas",
-      "Type" : "AWS::Lambda::Permission",
-      "Properties" : {
-        "Action" : "lambda:InvokeFunction",
-        "FunctionName" : {
-          "Fn::GetAtt" : [ "LogScaleCloudWatchMetricIngester", "Arn" ]
-        },
-        "Principal" : "logs.amazonaws.com"
-      }
-    },
     "LogScaleCloudWatchMetricIngesterLogGroup" : {
       "Condition" : "CreateMetricAndMetricStatisticsLambdas",
       "DependsOn" : [ "LogScaleCloudWatchRole" ],
@@ -650,17 +614,6 @@
         },
         "Runtime" : "python3.8",
         "Timeout" : "300"
-      }
-    },
-    "LogScaleCloudWatchMetricStatisticsIngesterPermission" : {
-      "Condition" : "CreateMetricAndMetricStatisticsLambdas",
-      "Type" : "AWS::Lambda::Permission",
-      "Properties" : {
-        "Action" : "lambda:InvokeFunction",
-        "FunctionName" : {
-          "Fn::GetAtt" : [ "LogScaleCloudWatchMetricStatisticsIngester", "Arn" ]
-        },
-        "Principal" : "logs.amazonaws.com"
       }
     },
     "LogScaleCloudWatchMetricStatisticsIngesterLogGroup" : {
