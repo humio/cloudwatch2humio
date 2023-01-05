@@ -61,3 +61,8 @@ A flow can be setup where older versions are deleted when a new one is uploaded.
 It is thus not necessary to make a new release of the integration unless the Python files are changed,
 however, changes to the CloudFormation file will still be included in the CHANGELOG. Therefore,
 version updates will happen whenever there are changes pushed to the GitHub repository. 
+
+## Adding new regions
+The most common request from users is that a new region be supported. Since the move to one bucket in one region,
+it is no longer necessary to add new buckets, and thus this code does not need any updates. To support a new region
+there simply needs to be added a link in the documentation. 
