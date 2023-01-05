@@ -4,17 +4,16 @@
 Updated naming where possible to LogScale.
 Added functionality to choose which S3 bucket should be used for 
 retrieving the code files for the AWS Lambda functions, 
-removed the option to choose older versions of the integration,
-and replaced the name Humio with LogScale where possible.
+removed the option to choose older versions of the integration.
 
 
 ### Added
 - Introduced parameter groups in the CF template.
-- Added parameter for setting the S3 bucket containing the Lambda code files.
-- Added parameter for setting the S3 key in the S3 bucket containing the Lambda code files.
-- Created resources for copying the Lambda code files from the specified S3 bucket, so that it is no longer required to create a new bucket in each region supported. The default S3 bucket hosted by Humio is named _humio-public-us-east-1_.
+- Added parameter for setting the S3 bucket containing the lambda code files.
+- Added parameter for setting the S3 key in the S3 bucket containing the lambda code files.
+- Created resources for copying the lambda code files from the specified S3 bucket, so that it is no longer required to create a new bucket in each region supported. The default S3 bucket hosted by Humio is named _humio-public-us-east-1_.
 - Added a parameter for determining whether the CloudTrail and S3 bucket for autosubscription should be created, which also made it possible to delete the additional CF template.
-- Added it possible for users to set which S3 bucket they want to retrieve the Lambda code files from, which also made it possible to delete the CF template for testing.
+- Added it possible for users to set which S3 bucket they want to retrieve the lambda code files from, which also made it possible to delete the CF template for testing.
 
 
 ### Changed
