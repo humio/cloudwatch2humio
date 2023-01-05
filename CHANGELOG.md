@@ -22,11 +22,13 @@ and replaced the name Humio with LogScale where possible.
 - Updated the README of the project to contain a section concerning how the integration works.
 - Updated the deployment scripts. 
 - Replaced 'Humio' with 'LogScale' where possible. 
+- Merged permissions regarding the subscriber into one.  
 
 ### Removed
 - Removed the CF template with no trail.
 - Removed the CF template for testing.
 - Removed the parameter related to versions, so that there is only the newest version of the code uploaded.
+- Removed unnecessary permissions for some of the AWS Lambdas. 
 
 ## 1.2.2 (2022-08-30)
 Added additional login at ingest error.
