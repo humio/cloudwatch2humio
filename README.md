@@ -52,15 +52,18 @@ the existing logs and then sending them to LogScale using some sort of shipper.
 Versioning is used for the ZIP package containing the deployment files.
 Versioning of the deployment package is required to make it possible to update an already installed
 integration's code files.
-A CloudStack will only update its files if the ZIP name changes, so you cannot use a ZIP file with the
+A CloudStack will only update its files if the name changes, so you cannot use a file with the
 same name as is already used to update with as it won't be recognized as a change. 
 So to force CloudStack to run an update, the deployment package name needs to be changed. 
 This means that only one file version is necessary to maintain in the public S3 bucket, 
 but the name needs to be updated every time there are new changes to the code files. 
-A flow can be setup where older versions are deleted when a new one is uploaded.
+
+A flow can be setup where older versions are deleted when a new one is uploaded, this does not yet exist.
+
 It is thus not necessary to make a new release of the integration unless the Python files are changed,
 however, changes to the CloudFormation file will still be included in the CHANGELOG. Therefore,
-version updates will happen whenever there are changes pushed to the GitHub repository. 
+version updates has happened whenever there are changes pushed to the GitHub repository to keep these
+two numbers aligned. 
 
 ## Adding new regions
 The most common request from users is that a new region be supported. Since the move to one bucket in one region,
