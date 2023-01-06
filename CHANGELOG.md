@@ -2,23 +2,21 @@
 
 ## 2.0.0 (2023-01-06)
 Updated naming where possible to LogScale.
-Added functionality to choose which S3 bucket should be used for 
-retrieving the code files for the AWS Lambda functions, 
-removed the option to choose older versions of the integration.
-
+Added functionality to choose which S3 bucket should be used for retrieving the code files for the AWS Lambda functions. 
+Removed the option to choose older versions of the integration.
+Removed unnecessary permissions for the CloudFormation resources. 
 
 ### Added
 - Introduced parameter groups in the CF template.
 - Added parameter for setting the S3 bucket containing the lambda code files.
 - Added parameter for setting the S3 key in the S3 bucket containing the lambda code files.
-- Created resources for copying the lambda code files from the specified S3 bucket, so that it is no longer required to create a new bucket in each region supported. The default S3 bucket hosted by Humio is named _humio-public-us-east-1_.
+- Created resources for copying the lambda code files from the specified S3 bucket, so that it is no longer required to create a new bucket in each region supported. The default S3 bucket hosted by LogScale is named _logscale-public-us-east-1_.
 - Added a parameter for determining whether the CloudTrail and S3 bucket for autosubscription should be created, which also made it possible to delete the additional CF template.
-- Added it possible for users to set which S3 bucket they want to retrieve the lambda code files from, which also made it possible to delete the CF template for testing.
-
+- Made it possible for users to set which S3 bucket and S3 key they want to retrieve the lambda code files from, which also made it possible to delete the CF template for testing.
 
 ### Changed
 - Made metric ingester and metric statistics ingester creation optional.
-- Updated the README of the project to contain a section concerning how the integration works.
+- Updated the README of the project to contain a section for how the integration works, how versioning works, and how to support new regions.
 - Updated the deployment scripts. 
 - Replaced 'Humio' with 'LogScale' where possible. 
 - Merged permissions regarding the subscriber into one.  
