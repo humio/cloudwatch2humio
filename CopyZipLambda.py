@@ -19,8 +19,8 @@ def copy_objects(source_bucket, dest_bucket, key):
     """
     Copy key from source bucket to destination bucket.
 
-    :param source_bucket: S3 bucket containing ZIP file with code.
-    :param dest_bucket: S3 bucket where ZIP file with code should be copied to.
+    :param source_bucket: S3 bucket containing zip file with code.
+    :param dest_bucket: S3 bucket where zip file with code should be copied to.
     :param key: File name to be copied.
     :return: None
     """
@@ -37,7 +37,7 @@ def copy_objects(source_bucket, dest_bucket, key):
 
 def delete_objects(bucket, key):
     """
-    Delete a bucket specified by the key.
+    Delete a bucket and its objects.
 
     :param bucket: S3 bucket to be deleted.
     :param key: S3 key to object that should be deleted.
@@ -52,7 +52,7 @@ def timeout(event, context):
     """
     Send a response to the custom resource if it times out.
 
-    :param event: Event data from the Lambda.
+    :param event: Event data from the lambda.
     :param context: Lambda context object.
     :return: None
     """
@@ -62,7 +62,7 @@ def timeout(event, context):
 
 def handler(event, context):
     """
-    Lambda handler that will copy the ZIP file from the source bucket to the
+    Lambda handler that will copy the zip file from the source bucket to the
     destination bucket.
 
     It will send a failure to CloudFormation if the function is going to timeout.
