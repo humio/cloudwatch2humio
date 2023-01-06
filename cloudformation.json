@@ -20,7 +20,7 @@
     },
     "LogScaleLambdaLogRetention" : {
       "Type" : "Number",
-      "Description" : "The number of days to retain CloudWatch logs for the created Lambda functions.",
+      "Description" : "The number of days to retain CloudWatch logs for the created lambda functions.",
       "Default": 1
     },
     "EnableCloudWatchLogsAutoSubscription" : {
@@ -61,7 +61,7 @@
         "true",
         "false"
       ],
-      "Description" : "Choose whether the metric ingester and the metric statistics ingester Lambdas should be created. These are not necessary for getting CloudWatch logs into LogScale. Set to 'true' to create.",
+      "Description" : "Choose whether the metric ingester and the metric statistics ingester lambdas should be created. These are not necessary for getting CloudWatch logs into LogScale. Set to 'true' to create.",
       "Default" : "false"
     },
     "EnableVPCForIngesterLambdas" : {
@@ -70,31 +70,31 @@
         "true",
         "false"
       ],
-      "Description" : "Use a VPC for the Lambda ingester functions. Set to 'true' to enable.",
+      "Description" : "Use a VPC for the lambda ingester functions. Set to 'true' to enable.",
       "Default" : "false"
     },
     "SecurityGroupIds" : {
       "Type" : "CommaDelimitedList",
-      "Description" : "A comma separated list of security group ids for the VPC configuration regarding the ingester Lambda functions. Only required if VPC is enabled."
+      "Description" : "A comma separated list of security group ids for the VPC configuration regarding the ingester lambda functions. Only required if VPC is enabled."
     },
     "SubnetIds" : {
       "Type" : "CommaDelimitedList",
-      "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester Lambda functions will be deployed into. Only required if VPC is enabled."
+      "Description" : "A comma separated list of subnet ids used by the VPC configuration that the ingester lambda functions will be deployed into. Only required if VPC is enabled."
     },
     "LogScaleLambdaLogLevel" : {
       "Type" : "String",
       "AllowedValues" : ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
       "Default" : "INFO",
-      "Description" : "The log level printed by the Lambda functions when they run. Note that a higher log level will result in more CloudWatch logs."
+      "Description" : "The log level printed by the lambda functions when they run. Note that a higher log level will result in more CloudWatch logs."
     },
     "S3BucketContainingLambdaCodeFiles" : {
       "Type" : "String",
-      "Description" : "The name of the S3 bucket containing the Lambda code files used for the integration. Change this if you want to retrieve the code files from another S3 bucket than the default 'logscale-public-us-east-1'.",
+      "Description" : "The name of the S3 bucket containing the lambda code files used for the integration. Change this if you want to retrieve the code files from another S3 bucket than the default 'logscale-public-us-east-1'.",
       "Default" : "logscale-public-us-east-1"
     },
     "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" : {
       "Type" : "String",
-      "Description" : "The name of the S3 key in the S3 bucket containing the Lambda code files used for the integration. Change this if you have named the deployment package containing the code files something other than the default 'v2.0.0_cloudwatch2logscale.zip'.",
+      "Description" : "The name of the S3 key in the S3 bucket containing the lambda code files used for the integration. Change this if you have named the deployment package containing the code files something other than the default 'v2.0.0_cloudwatch2logscale.zip'.",
       "Default" : "v2.0.0_cloudwatch2logscale.zip"
     }
   },
