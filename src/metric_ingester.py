@@ -13,7 +13,7 @@ logger.setLevel(level)
 
 def lambda_handler(event, context):
     """
-    Ingest CloudWatch Metrics data to Humio repository.
+    Ingest CloudWatch Metrics data to LogScale repository.
 
     :param event: Event data.
     :type event: dict
@@ -65,11 +65,11 @@ def lambda_handler(event, context):
             Payload=json.dumps(event)
         )
 
-    # Format metric data to Humio event data.
-    humio_events = create_humio_events(metric_data, configurations)
+    # Format metric data to LogsScale event data.
+    logscale_events = create_logscale_events(metric_data, configurations)
 
-    # Send Humio event data to Humio.
-    helpers.ingest_events(humio_events, "cloudwatch_metrics")
+    # Send LogScale event data to LogScale.
+    helpers.ingest_events(logscale_events, "cloudwatch_metrics")
 
 
 def get_metric_data(configurations):
@@ -92,9 +92,9 @@ def get_metric_data(configurations):
     return metric_data
 
 
-def create_humio_events(metrics, configurations):
+def create_logscale_events(metrics, configurations):
     """
-    Create list of Humio events based on metrics.
+    Create list of LogScale events based on metrics.
 
     :param metrics: Metrics received from GetMetricData.
     :type metrics: dict
@@ -102,12 +102,12 @@ def create_humio_events(metrics, configurations):
     :param configurations: User defined API request parameters for the boto client.
     :type configurations: dict
 
-    :return: Events to be sent to Humio.
+    :return: Events to be sent to LogScale.
     :rtype: list
     """
-    humio_events = []
+    logscale_events = []
 
-    # Create Humio event based on each extracted timestamp. 
+    # Create LogScale event based on each extracted timestamp.
     for result in metrics["MetricDataResults"]:
         count = 0
         for timestamp in result["Timestamps"]:
@@ -126,7 +126,7 @@ def create_humio_events(metrics, configurations):
                     "requestParameters": configurations
                 }
             }
-            humio_events.append(event)
+            logscale_events.append(event)
             count += 1
 
-    return humio_events
+    return logscale_events

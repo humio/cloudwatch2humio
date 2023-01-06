@@ -3,8 +3,8 @@ import os
 import helpers
 
 # Set environment variables.
-humio_log_ingester_arn = os.environ["humio_log_ingester_arn"]
-humio_subscription_prefix = os.environ.get("humio_subscription_prefix")
+logscale_log_ingester_arn = os.environ["logscale_log_ingester_arn"]
+logscale_subscription_prefix = os.environ.get("logscale_subscription_prefix")
 
 # Set up CloudWatch Logs client.
 log_client = boto3.client("logs")
@@ -26,14 +26,14 @@ def lambda_handler(event, context):
     log_group_name = event["detail"]["requestParameters"]["logGroupName"]
   
     # Check whether the prefix is set - the prefix is used to determine which logs we want.
-    if not humio_subscription_prefix:
+    if not logscale_subscription_prefix:
         helpers.create_subscription(
-            log_client, log_group_name, humio_log_ingester_arn, context
+            log_client, log_group_name, logscale_log_ingester_arn, context
         )
 
     else:
         # Check whether the log group's name starts with the set prefix.
-        if log_group_name.startswith(humio_subscription_prefix):
+        if log_group_name.startswith(logscale_subscription_prefix):
             helpers.create_subscription(
-                log_client, log_group_name, humio_log_ingester_arn, context
+                log_client, log_group_name, logscale_log_ingester_arn, context
             )

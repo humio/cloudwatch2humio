@@ -13,7 +13,7 @@ logger.setLevel(level)
 def lambda_handler(event, context):
     """
     Extract log data from CloudWatch Logs events and
-    pass the data onto the Humio ingester.
+    pass the data onto the LogScale ingester.
 
     :param event: Event data from CloudWatch Logs.
     :type event: dict
@@ -52,7 +52,7 @@ def lambda_handler(event, context):
         )
 
     # Flatten the events from CloudWatch Logs.
-    humio_events = []
+    logscale_events = []
     for log_event in decoded_event["logEvents"]:
         message = log_event["message"]
 
@@ -62,7 +62,7 @@ def lambda_handler(event, context):
         attributes.update(helpers.parse_message(message))
 
         # Append the flattened event
-        humio_events.append({
+        logscale_events.append({
             "timestamp": log_event["timestamp"],
             "rawstring": message,
             "kvparse": True,
@@ -70,4 +70,4 @@ def lambda_handler(event, context):
         })
 
     # Make request to Humio.
-    helpers.ingest_events(humio_events, 'cloudwatch_logs')
+    helpers.ingest_events(logscale_events, 'cloudwatch_logs')

@@ -1,4 +1,4 @@
-build: clean target copy dependencies target/cloudwatch2humio.zip
+build: clean target copy dependencies target/cloudwatch2logscale.zip
 
 clean:
 	rm -rf target/*
@@ -12,8 +12,8 @@ copy:
 dependencies:
 	pip3 install -r requirements.txt -t target
 
-target/cloudwatch2humio.zip:
-	(cd target/ && zip -r ../target/v1.2.2_cloudwatch2humio.zip * )
+target/cloudwatch2logscale.zip:
+	(cd target/ && zip -r ../target/v2.0.0_cloudwatch2logscale.zip * )
 
 clean:
 	rm -rf target
