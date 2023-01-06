@@ -2,7 +2,7 @@
 
 ## 2.0.0 (2023-01-06)
 Updated naming where possible to LogScale.
-Added functionality to choose which S3 bucket should be used for retrieving the code files for the AWS Lambda functions. 
+Added functionality to choose which S3 bucket and S3 key should be used for retrieving the code files for the AWS Lambda functions. 
 Removed the option to choose older versions of the integration.
 Removed unnecessary permissions for the CloudFormation resources. 
 
