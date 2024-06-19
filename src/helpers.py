@@ -188,21 +188,21 @@ def parse_message(message):
 
 # Standard out from Lambdas.
 std_matcher = re.compile(
-    "\d\d\d\d-\d\d-\d\d\S+\s+(?P<request_id>\S+)"
+    r"\d\d\d\d-\d\d-\d\d\S+\s+(?P<request_id>\S+)"
 )
 
 
 # END RequestId: b3be449c-8bd7-11e7-bb30-4f271af95c46
 end_matcher = re.compile(
-    "END RequestId:\s+(?P<request_id>\S+)"
+    r"END RequestId:\s+(?P<request_id>\S+)"
 )
 
 
 # START RequestId: b3be449c-8bd7-11e7-bb30-4f271af95c46
 # Version: $LATEST
 start_matcher = re.compile(
-    "START RequestId:\s+(?P<request_id>\S+)\s+"
-    "Version: (?P<version>\S+)"
+    r"START RequestId:\s+(?P<request_id>\S+)\s+"
+    r"Version: (?P<version>\S+)"
 )
 
 
@@ -212,9 +212,9 @@ start_matcher = re.compile(
 # Memory Size: 128 MB
 # Max Memory Used: 20 MB
 report_matcher = re.compile(
-    "REPORT RequestId:\s+(?P<request_id>\S+)\s+"
-    "Duration: (?P<duration>\S+) ms\s+"
-    "Billed Duration: (?P<billed_duration>\S+) ms\s+"
-    "Memory Size: (?P<memory_size>\S+) MB\s+"
-    "Max Memory Used: (?P<max_memory>\S+) MB"
+    r"REPORT RequestId:\s+(?P<request_id>\S+)\s+"
+    r"Duration: (?P<duration>\S+) ms\s+"
+    r"Billed Duration: (?P<billed_duration>\S+) ms\s+"
+    r"Memory Size: (?P<memory_size>\S+) MB\s+"
+    r"Max Memory Used: (?P<max_memory>\S+) MB"
 )

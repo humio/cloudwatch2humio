@@ -94,8 +94,8 @@
     },
     "S3KeyOfTheDeploymentPackageContainingLambdaCodeFiles" : {
       "Type" : "String",
-      "Description" : "The name of the S3 key in the S3 bucket containing the lambda code files used for the integration. Change this if you have named the deployment package containing the code files something other than the default 'v2.0.0_cloudwatch2logscale.zip'.",
-      "Default" : "v2.0.0_cloudwatch2logscale.zip"
+      "Description" : "The name of the S3 key in the S3 bucket containing the lambda code files used for the integration. Change this if you have named the deployment package containing the code files something other than the default 'v2.1.0_cloudwatch2logscale.zip'.",
+      "Default" : "v2.1.0_cloudwatch2logscale.zip"
     }
   },
   "Conditions" : {
@@ -263,7 +263,7 @@
       "Properties": {
         "Description" : "Copies objects from a S3 bucket to a destination.",
         "Handler" : "index.handler",
-        "Runtime" : "python3.8",
+        "Runtime" : "python3.12",
         "Timeout" : "300",
         "Role" : { "Fn::GetAtt": [ "LogScaleCloudWatchRole", "Arn" ] },
         "Code" : {
@@ -314,7 +314,7 @@
         "Role" : {
           "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
-        "Runtime" : "python3.8",
+        "Runtime" : "python3.12",
         "Timeout" : "300"
       }
     },
@@ -361,7 +361,7 @@
         "Role" : {
           "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
-        "Runtime" : "python3.8",
+        "Runtime" : "python3.12",
         "Timeout" : "300"
       }
     },
@@ -412,7 +412,7 @@
         "Role" : {
           "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
-        "Runtime" : "python3.8",
+        "Runtime" : "python3.12",
         "Timeout" : "300"
       }
     },
@@ -563,7 +563,7 @@
         "Role" : {
           "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
-        "Runtime" : "python3.8",
+        "Runtime" : "python3.12",
         "Timeout" : "300"
       }
     },
@@ -612,7 +612,7 @@
         "Role" : {
           "Fn::GetAtt" : [ "LogScaleCloudWatchRole", "Arn" ]
         },
-        "Runtime" : "python3.8",
+        "Runtime" : "python3.12",
         "Timeout" : "300"
       }
     },
