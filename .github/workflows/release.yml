@@ -19,8 +19,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ env.RELEASE_VERSION }}_cloudwatch2humio.zip
-          asset_name: ${{ env.RELEASE_VERSION }}_cloudwatch2humio.zip
+          file: target/${{ env.RELEASE_VERSION }}_cloudwatch2logscale.zip
+          asset_name: ${{ env.RELEASE_VERSION }}_cloudwatch2logscale.zip
           tag: ${{ env.RELEASE_VERSION }}
           overwrite: true
           body: "Automatic release. See changelog for updates"
