@@ -13,7 +13,7 @@ dependencies:
 	pip3 install -r requirements.txt -t target
 
 target/cloudwatch2logscale.zip:
-	(cd target/ && zip -r ../target/v2.1.0_cloudwatch2logscale.zip * )
+	(cd target/ && zip -r ../target/v2.1.1_cloudwatch2logscale.zip * )
 
 clean:
 	rm -rf target
