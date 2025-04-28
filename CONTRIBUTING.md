@@ -97,7 +97,7 @@ Following is described how to set up the integration for local development.
 
     - `CAPABILITY_IAM` is the required value here. 
 
-7. Upating the stack.
+7. Updating the stack.
 
     - To update the stack, add your changes and use the command: 
     
@@ -131,10 +131,10 @@ When a new release of the integration needs to be uploaded to the S3 buckets hos
 To update the version, follow these steps:
 
 1. Make sure `CHANGELOG.md` has an entry for the new release version.
-2. Locally, check out the `master` branch and pull from `origin/mater`.
+2. Locally, check out the `master` branch and pull from `origin/master`.
 3. Use `bump2version` to bump the project version and create a commit.
 
-    * To craete a patch run: `bump2version patch`
+    * To create a patch run: `bump2version patch`
     * To create a minor run: `bump2version minor`
     * To create a major run: `bump2version major`
 
